@@ -34,5 +34,5 @@ class AcclaimIntegrationProvider(object):
         """
         result = component.queryUtility(IAcclaimIntegration)
         if result is None:
-            result = (AcclaimIntegration(title=u'Integrate with Acclaim'),)
+            result = AcclaimIntegration(title=u'Integrate with Acclaim')
         return (result,)

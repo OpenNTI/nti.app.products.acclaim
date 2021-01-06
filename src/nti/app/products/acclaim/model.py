@@ -25,14 +25,17 @@ from nti.schema.schema import SchemaConfigured
 logger = __import__('logging').getLogger(__name__)
 
 
+# Order of parent classes matters here
 @WithRepr
 @interface.implementer(IAcclaimIntegration)
-class AcclaimIntegration(SchemaConfigured,
-                         PersistentCreatedModDateTrackingObject,
+class AcclaimIntegration(PersistentCreatedModDateTrackingObject,
+                         SchemaConfigured,
                          Contained):
 
     __parent__ = None
     __name__ = None
+
+    title = u'Acclaim Integration'
 
     createDirectFieldProperties(IAcclaimIntegration)
     mimeType = mime_type = "application/vnd.nextthought.site.acclaimintegration"

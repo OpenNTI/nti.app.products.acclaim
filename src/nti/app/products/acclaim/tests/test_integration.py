@@ -5,18 +5,13 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-from hamcrest import is_
-from hamcrest import none
 from hamcrest import not_none
 from hamcrest import assert_that
 from hamcrest import has_entries
-from hamcrest import contains_inanyorder
 
 from zope.component.hooks import getSite
 
 from zope.securitypolicy.interfaces import IPrincipalRoleManager
-
-from nti.app.testing.webtest import TestApp
 
 from nti.app.testing.application_webtest import ApplicationLayerTest
 
@@ -70,12 +65,17 @@ class TestIntegration(ApplicationLayerTest):
         self.require_link_href_with_rel(acclaim_int, 'enable')
 
         # Enable integration
-        res = self.testapp.post(enable_href,
-                                {'authorization_token', 'acclaim_authorization_token'},
-                                extra_environ=site_admin_env)
-        from IPython.terminal.debugger import set_trace;set_trace()
+        res = self.testapp.post_json(enable_href,
+                                     {'authorization_token': 'acclaim_authorization_token'},
+                                     extra_environ=site_admin_env)
+        res = res.json_body
+        assert_that(res, has_entries('CreatedTime', not_none(),
+                                     'NTIID', not_none(),
+                                     'authorization_token', 'acclaim_authorization_token',
+                                     'Creator', 'acclaim_site_admin',
+                                     'Last Modified', not_none()))
 
-        self.testapp.post(enable_href,
-                          {'authorization_token', 'acclaim_authorization_token'},
-                          extra_environ=site_admin_env,
-                          status=422)
+        self.testapp.post_json(enable_href,
+                               {'authorization_token': 'acclaim_authorization_token'},
+                               extra_environ=site_admin_env,
+                               status=422)

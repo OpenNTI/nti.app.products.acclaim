@@ -15,7 +15,7 @@ from zope.component.hooks import getSite
 
 from zope.container.interfaces import ILocation
 
-from nti.app.products.google.sso import ENABLE_ACCLAIM_VIEW
+from nti.app.products.acclaim import ENABLE_ACCLAIM_VIEW
 
 from nti.app.products.acclaim.interfaces import IAcclaimIntegration
 
