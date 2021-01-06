@@ -21,6 +21,7 @@ from nti.externalization.representation import WithRepr
 from nti.schema.fieldproperty import createDirectFieldProperties
 
 from nti.schema.schema import SchemaConfigured
+from nti.app.products.integration.integration import AbstractIntegration
 
 logger = __import__('logging').getLogger(__name__)
 
@@ -28,8 +29,8 @@ logger = __import__('logging').getLogger(__name__)
 # Order of parent classes matters here
 @WithRepr
 @interface.implementer(IAcclaimIntegration)
-class AcclaimIntegration(PersistentCreatedModDateTrackingObject,
-                         SchemaConfigured,
+class AcclaimIntegration(AbstractIntegration,
+                         PersistentCreatedModDateTrackingObject,
                          Contained):
 
     __parent__ = None

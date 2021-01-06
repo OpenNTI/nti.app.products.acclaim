@@ -15,10 +15,12 @@ from nti.app.products.integration.interfaces import IIntegration
 from nti.base.interfaces import ICreated
 from nti.base.interfaces import ILastModified
 
+from nti.coremetadata.interfaces import IShouldHaveTraversablePath
+
 from nti.schema.field import ValidTextLine
 
 
-class IAcclaimIntegration(IIntegration, ICreated, ILastModified):
+class IAcclaimIntegration(IIntegration, ICreated, ILastModified, IShouldHaveTraversablePath):
     """
     Acclaim integration
     """
