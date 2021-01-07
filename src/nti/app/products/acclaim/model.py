@@ -12,6 +12,8 @@ from zope import interface
 
 from zope.container.contained import Contained
 
+from nti.app.products.acclaim import ACCLAIM_INTEGRATION_NAME
+
 from nti.app.products.acclaim.interfaces import IAcclaimIntegration
 
 from nti.app.products.integration.integration import AbstractIntegration
@@ -33,7 +35,7 @@ class AcclaimIntegration(AbstractIntegration,
                          Contained):
 
     __parent__ = None
-    __name__ = None
+    __name__ = ACCLAIM_INTEGRATION_NAME
 
     title = u'Acclaim Integration'
 
