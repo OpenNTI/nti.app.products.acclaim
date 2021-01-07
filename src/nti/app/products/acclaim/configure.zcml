@@ -23,6 +23,9 @@
     <grant permission="nti.actions.acclaim"
            role="role:nti.dataserver.site-admin"/>
 
+    <grant permission="nti.actions.acclaim"
+           role="role:nti.admin"/>
+
     <include package="nti.externalization" file="meta.zcml" />
     <include package="nti.externalization" />
     <ext:registerAutoPackageIO

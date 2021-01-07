@@ -6,6 +6,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 from hamcrest import not_none
+from hamcrest import has_entry
 from hamcrest import assert_that
 from hamcrest import has_entries
 
@@ -39,7 +40,9 @@ class TestIntegration(ApplicationLayerTest):
         """
         admin_username = 'acclaim_int@nextthought.com'
         site_admin_username = 'acclaim_site_admin'
+        other_username = 'acclaim_int_other'
         with mock_dataserver.mock_db_trans(self.ds):
+            self._create_user(other_username)
             self._create_user(admin_username)
             self._assign_role_for_site(ROLE_ADMIN, admin_username)
             self._create_user(site_admin_username)
@@ -47,6 +50,7 @@ class TestIntegration(ApplicationLayerTest):
             self._assign_role_for_site(ROLE_SITE_ADMIN, site_admin_username)
 
         admin_env = self._make_extra_environ(admin_username)
+        other_env = self._make_extra_environ(other_username)
         site_admin_env = self._make_extra_environ(site_admin_username)
 
         def _get_acclaim_int(username, env):
@@ -65,17 +69,40 @@ class TestIntegration(ApplicationLayerTest):
         self.require_link_href_with_rel(acclaim_int, 'enable')
 
         # Enable integration
+        self.testapp.post_json(enable_href,
+                               {'authorization_token': 'acclaim_authorization_token'},
+                               extra_environ=other_env,
+                               status=403)
+
         res = self.testapp.post_json(enable_href,
                                      {'authorization_token': 'acclaim_authorization_token'},
                                      extra_environ=site_admin_env)
         res = res.json_body
+        acclaim_href = res.get('href')
+        assert_that(acclaim_href, not_none())
         assert_that(res, has_entries('CreatedTime', not_none(),
                                      'NTIID', not_none(),
                                      'authorization_token', 'acclaim_authorization_token',
                                      'Creator', 'acclaim_site_admin',
                                      'Last Modified', not_none()))
 
+        # Can not re-enable
         self.testapp.post_json(enable_href,
                                {'authorization_token': 'acclaim_authorization_token'},
                                extra_environ=site_admin_env,
                                status=422)
+
+        self.testapp.put_json(acclaim_href,
+                              {'authorization_token': 'new_token'},
+                              extra_environ=other_env,
+                              status=403)
+
+        res = self.testapp.put_json(acclaim_href,
+                                    {'authorization_token': 'new_token'},
+                                    extra_environ=site_admin_env)
+        res = res.json_body
+        assert_that(res, has_entry('authorization_token', 'new_token'))
+
+        self.testapp.get(acclaim_href, extra_environ=other_env, status=403)
+        self.testapp.get(acclaim_href, extra_environ=admin_env)
+        self.testapp.get(acclaim_href, extra_environ=site_admin_env)

@@ -14,14 +14,13 @@ from zope.container.contained import Contained
 
 from nti.app.products.acclaim.interfaces import IAcclaimIntegration
 
+from nti.app.products.integration.integration import AbstractIntegration
+
 from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 
 from nti.externalization.representation import WithRepr
 
 from nti.schema.fieldproperty import createDirectFieldProperties
-
-from nti.schema.schema import SchemaConfigured
-from nti.app.products.integration.integration import AbstractIntegration
 
 logger = __import__('logging').getLogger(__name__)
 
