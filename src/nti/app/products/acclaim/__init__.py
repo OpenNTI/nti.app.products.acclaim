@@ -6,4 +6,4 @@ MessageFactory = zope.i18nmessageid.MessageFactory(__name__)
 
 ENABLE_ACCLAIM_VIEW = 'EnableAcclaim'
 
-ACCLAIM_INTEGRATION_NAME = 'acclaim'
+ACCLAIM_INTEGRATION_NAME = u'acclaim'
