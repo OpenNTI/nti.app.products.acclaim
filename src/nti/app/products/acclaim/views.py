@@ -31,7 +31,8 @@ from nti.app.products.acclaim import MessageFactory as _
 
 from nti.app.products.acclaim.authorization import ACT_ACCLAIM
 
-from nti.app.products.acclaim.interfaces import IAcclaimIntegration
+from nti.app.products.acclaim.interfaces import IAcclaimIntegration,\
+    IAcclaimClient
 
 from nti.appserver.dataserver_pyramid_views import GenericGetView
 
@@ -39,13 +40,17 @@ from nti.appserver.ugd_edit_views import UGDPutView
 
 from nti.dataserver.interfaces import IHostPolicyFolder
 
+from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import StandardExternalFields
 
 from nti.site.localutility import install_utility
 
 logger = __import__('logging').getLogger(__name__)
 
+ITEMS = StandardExternalFields.ITEMS
+TOTAL = StandardExternalFields.TOTAL
 MIMETYPE = StandardExternalFields.MIMETYPE
+ITEM_COUNT = StandardExternalFields.ITEM_COUNT
 
 
 def raise_error(data, tb=None,
@@ -98,12 +103,44 @@ class EnableAcclaimIntegrationView(AbstractAuthenticatedView,
     def _do_call(self):
         logger.info("Integration acclaim for site (%s) (%s)",
                     self.site.__name__, self.remoteUser)
+        # XXX: The usual "what do we do" for parent and child site questions here.
         if component.queryUtility(IAcclaimIntegration):
             raise_error({'message': _(u"Acclaim integration already exist"),
                          'code': 'ExistingAcclaimIntegrationError'})
         integration = self.readCreateUpdateContentObject(self.remoteUser)
-        self._register_integration(integration)
-        return integration
+        if integration.organization:
+            result = self._register_integration(integration)
+        else:
+            client = IAcclaimClient(integration)
+            organizations = client.get_organizations()
+            if len(organizations) == 1:
+                # Just one organization - set and use
+                integration.organization = organizations[1]
+                result = self._register_integration(integration)
+            else:
+                logger.info("Multiple organizations tied to auth token (%s) (%s)",
+                            integration.authorization_token,
+                            organizations)
+                # No organization - so return the set
+                result = organizations
+        return result
+
+
+@view_config(route_name='objects.generic.traversal',
+             context=IAcclaimIntegration,
+             request_method='GET',
+             permission=ACT_ACCLAIM,
+             name='organizations',
+             renderer='rest')
+class AcclaimIntegrationOrganizationsView(AbstractAuthenticatedView):
+
+    def __call__(self):
+        result = LocatedExternalDict()
+        client = IAcclaimClient(self.context)
+        organizations = client.get_organizations()
+        result[ITEMS] = items = organizations
+        result[ITEM_COUNT] = result[TOTAL] = len(items)
+        return result
 
 
 @view_config(route_name='objects.generic.traversal',

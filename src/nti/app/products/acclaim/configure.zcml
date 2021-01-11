@@ -29,7 +29,9 @@
     <include package="nti.externalization" file="meta.zcml" />
     <include package="nti.externalization" />
     <ext:registerAutoPackageIO
-        root_interfaces=".interfaces.IAcclaimIntegration"
+        root_interfaces=".interfaces.IAcclaimBadge
+                         .interfaces.IAcclaimIntegration
+                         .interfaces.IAcclaimOrganization"
         modules=".model" />
 
     <!-- Integration -->

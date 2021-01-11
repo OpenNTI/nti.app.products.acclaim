@@ -9,163 +9,196 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import requests
+import nameparser
+
+from base64 import b64encode
 
 from zope import component
 from zope import interface
 
-from zope.cachedescriptors.property import Lazy
+from zope.intid.interfaces import IIntIds
 
 from nti.app.products.acclaim.interfaces import IAcclaimBadge
 from nti.app.products.acclaim.interfaces import IAcclaimClient
 from nti.app.products.acclaim.interfaces import AcclaimClientError
 from nti.app.products.acclaim.interfaces import IAcclaimIntegration
+from nti.app.products.acclaim.interfaces import IAwardedAcclaimBadge
+from nti.app.products.acclaim.interfaces import IAcclaimOrganization
 from nti.app.products.acclaim.interfaces import IAcclaimBadgeCollection
+from nti.app.products.acclaim.interfaces import IAwardedAcclaimBadgeCollection
+from nti.app.products.acclaim.interfaces import IAcclaimOrganizationCollection
+from nti.app.products.acclaim.interfaces import MissingAcclaimOrganizationError
+
+from nti.dataserver.users.interfaces import IUserProfile
+from nti.dataserver.users.interfaces import IFriendlyNamed
 
 logger = __import__('logging').getLogger(__name__)
 
 
-@component.adapter(IGoToWebinarAuthorizedIntegration)
-@interface.implementer(IWebinarClient)
-class GoToWebinarClient(object):
+@component.adapter(IAcclaimIntegration)
+@interface.implementer(IAcclaimClient)
+def integration_to_client(integration):
+    if integration.authorization_token:
+        return AcclaimClient(integration.authorization_token)
+
+
+@interface.implementer(IAcclaimClient)
+class AcclaimClient(object):
     """
-    The client to interact with making GOTO webinar API calls. This should
-    live within a single request lifespan.
+    The client to interact with acclaim.
     """
 
-    _access_token = None
+    BASE_URL = 'https://api.youracclaim.com/v1'
 
-    GOTO_BASE_URL = 'https://api.getgo.com/G2W/rest'
+    ORGANIZATIONS_URL = '/organizations'
+    ORGANIZATIONS_ORG_URL = '/organizations/%s'
+    ORGANIZATION_ALL_BADGES_URL = '/organizations/%s/badge_templates'
+    ORGANIZATION_BADGE_URL = '/organizations/%s/badge_templates/%s'
 
-    ALL_WEBINARS = '/organizers/%s/webinars'
-    WEBINAR_URL = '/organizers/%s/webinars/%s'
-    UPCOMING_WEBINARS = '/organizers/%s/upcomingWebinars'
+    BADGE_URL = '/organizations/%s/badges'
 
-    WEBINAR_SESSIONS = '/organizers/%s/webinars/%s/sessions'
-    WEBINAR_PROGRESS = '/organizers/%s/webinars/%s/attendees'
-    SESSION_PROGRESS = '/organizers/%s/webinars/%s/sessions/%s/attendees'
+    def __init__(self, authorization_token):
+        self.authorization_token = authorization_token
+        self.b64_token = b64encode(self.authorization_token)
+        self.organization_id = authorization_token.organization_id
 
-    REGISTRANT = '/organizers/%s/webinars/%s/registrants/%s'
-    REGISTRANTS = '/organizers/%s/webinars/%s/registrants'
-    REGISTER_FIELDS = '/organizers/%s/webinars/%s/registrants/fields'
-
-    def __init__(self, authorized_integration):
-        self.authorized_integration = authorized_integration
-
-    @Lazy
-    def _access_token(self):
-        return self.authorized_integration.access_token
-
-    def _update_access_token(self):
-        result = self.authorized_integration.update_tokens(self._access_token)
-        self._access_token = result
-
-    def _make_call(self, url, post_data=None, delete=False, acceptable_return_codes=None):
+    def _make_call(self, url, post_data=None, params=None, delete=False, acceptable_return_codes=None):
         if not acceptable_return_codes:
             acceptable_return_codes = (200,)
-        url = '%s%s' % (self.GOTO_BASE_URL, url)
+        url = '%s%s' % (self.BASE_URL, url)
 
-        def _do_make_call():
-            access_header = 'Bearer %s' % self._access_token
-            if post_data:
-                return requests.post(url,
+        access_header = 'Bearer %s' % self.b64_token
+        if post_data:
+            response = requests.post(url,
                                      json=post_data,
                                      headers={'Authorization': access_header,
                                               'Accept': 'application/json'})
-            elif delete:
-                return requests.delete(url,
+        elif delete:
+            response = requests.delete(url,
                                        headers={'Authorization': access_header})
-            else:
-                return requests.get(url,
+        else:
+            response = requests.get(url,
+                                    params=params,
                                     headers={'Authorization': access_header})
-        response = _do_make_call()
-        if response.status_code in (401, 403):
-            # Ok, expired token, refresh and try again.
-            self._update_access_token()
-            response = _do_make_call()
-
         if response.status_code not in acceptable_return_codes:
-            logger.warn('Error while making webinar API call (%s) (%s) (%s)',
+            logger.warn('Error while making acclaim API call (%s) (%s) (%s)',
                         url,
                         response.status_code,
                         response.text)
-            raise WebinarClientError(response.text)
+            raise AcclaimClientError(response.text)
         return response
 
-    def get_all_webinars(self, raw=False):
-        url = self.ALL_WEBINARS % self.authorized_integration.organizer_key
+    def get_badge(self, badge_template_id):
+        """
+        Get the :class:`IAcclaimBadge` associated with the template id.
+        """
+        if not self.organization_id:
+            raise MissingAcclaimOrganizationError()
+        url = self.ORGANIZATION_BADGE_URL % (self.organization_id, badge_template_id)
         result = self._make_call(url)
-        if raw:
-            return result.json()
-        result = IWebinarCollection(result.json())
-        return result.webinars
+        result = IAcclaimBadge(result.json())
+        return result
 
-    def get_upcoming_webinars(self, raw=False):
-        url = self.UPCOMING_WEBINARS % self.authorized_integration.organizer_key
+    def get_badges(self, sort=None, filters=None, page=None):
+        """
+        Return an :class:`IAcclaimBadgeCollection`.
+
+        https://www.youracclaim.com/docs/badge_templates
+        """
+        if not self.organization_id:
+            raise MissingAcclaimOrganizationError()
+        params = dict()
+        if sort:
+            params['sort'] = sort
+        if filters:
+            params['filters'] = filters
+        if page:
+            params['page'] = page
+        url = self.ORGANIZATION_ALL_BADGES_URL % self.organization_id
+        result = self._make_call(url, params=params)
+        result = IAcclaimBadgeCollection(result.json())
+        return result
+
+    def get_organization(self, organization_id):
+        """
+        Get the :class:`IAcclaimOrganization` for this organization id.
+        """
+        url = self.ORGANIZATIONS_ORG_URL % organization_id
         result = self._make_call(url)
-        if raw:
-            return result.json()
-        result = IWebinarCollection(result.json())
-        return result.webinars
-
-    def get_webinar(self, webinar_key, raw=False):
-        url = self.WEBINAR_URL % (self.authorized_integration.organizer_key, webinar_key)
-        get_response = self._make_call(url, acceptable_return_codes=(200, 404))
-        result = None
-        if get_response.status_code != 404:
-            if raw:
-                result = get_response.json()
-            else:
-                result = IWebinar(get_response.json())
+        result = IAcclaimOrganization(result.json())
         return result
 
-    def get_registration_fields(self, webinar_key):
-        url = self.REGISTER_FIELDS % (self.authorized_integration.organizer_key, webinar_key)
-        get_response = self._make_call(url, acceptable_return_codes=(200, 404))
-        result = None
-        if get_response.status_code != 404:
-            result = IWebinarRegistrationFields(get_response.json())
+    def get_organizations(self):
+        """
+        Get all :class:`IAcclaimOrganization` objects.
+        """
+        url = self.ORGANIZATIONS_URL
+        result = self._make_call(url)
+        result = IAcclaimOrganizationCollection(result.json())
         return result
 
-    def register_user(self, user, webinar_key, registration_data):
-        url = self.REGISTRANTS % (self.authorized_integration.organizer_key,
-                                  webinar_key)
-        # 409 if user is already registered
-        response = self._make_call(url,
-                                   post_data=registration_data,
-                                   acceptable_return_codes=(201, 400, 409))
-        if response.status_code == 400:
-            raise WebinarRegistrationError(response.json())
+    def _get_user_id(self, user):
+        intids = component.getUtility(IIntIds)
+        return intids.getId(user)
 
-        if response.status_code == 409:
-            logger.info('User already registered for webinar')
-
-        # We want to return a metadata object on 409 so we can store it if
-        # we have not already.
-        data = response.json()
-        creator = user.username
-        registrant_key = unicode(data.get('registrantKey'))
-        data = {'join_url': data.get('joinUrl'),
-                'registrant_key': registrant_key,
-                'webinar_key': webinar_key,
-                'organizer_key': self.authorized_integration.organizer_key,
-                'creator': creator}
-        return IWebinarRegistrationMetadata(data)
-
-    def unregister_user(self, webinar_key, registrant_key):
-        url = self.REGISTRANT % (self.authorized_integration.organizer_key,
-                                 webinar_key,
-                                 registrant_key)
-        response = self._make_call(url, delete=True,
-                                   acceptable_return_codes=(204, 404))
-        result = response.status_code == 200
+    def _get_filter_str(self, filter_dict):
+        result = ''
+        for key, val in filter_dict.items():
+            result += '%s::%s' % (key, val)
         return result
 
-    def get_webinar_progress(self, webinar_key):
-        url = self.WEBINAR_PROGRESS % (self.authorized_integration.organizer_key,
-                                       webinar_key)
-        get_response = self._make_call(url,
-                                       acceptable_return_codes = (200, 404))
-        result = None
-        if get_response.status_code != 404:
-            result = [IUserWebinarProgress(x) for x in get_response.json()]
+    def get_awarded_badges(self, user, sort=None, filters=None, page=None):
+        """
+        Return an :class:`IAwardedAcclaimBadgeCollection`.
+
+        https://www.youracclaim.com/docs/issued_badges filtered by user email.
+        """
+        if not self.organization_id:
+            raise MissingAcclaimOrganizationError()
+        params = dict()
+        filters = dict(filters) if filters else dict()
+        filters['user_id'] = self._get_user_id(user)
+        # Is this what we want?
+        filters['state'] = 'pending,accepted'
+        if sort:
+            params['sort'] = sort
+        if filters:
+            params['filters'] = self._get_filter_str(filters)
+        if page is not None:
+            params['page'] = page
+        url = self.BADGE_URL % self.organization_id
+        result = self._make_call(url, params=params)
+        result = IAwardedAcclaimBadgeCollection(result.json())
         return result
+
+    def award_badge(self, user, badge_template_id, suppress_badge_notification_email=True, locale=None):
+        """
+        Award a badge to a user.
+
+        https://www.youracclaim.com/docs/issued_badges
+        """
+        if not self.organization_id:
+            raise MissingAcclaimOrganizationError()
+        profile = IUserProfile(user)
+        data = dict()
+        data['user_id'] = self._get_user_id(user)
+        # TODO: what email state is acceptable?
+        # if invalid email, do we award badges after user updates email?
+        data['recipient_email'] = profile.email
+
+        # TODO: Raise if no real name?
+        friendly_named = IFriendlyNamed(user)
+        if friendly_named.realname and '@' not in friendly_named.realname:
+            human_name = nameparser.HumanName(friendly_named.realname)
+            data['issued_to_first_name'] = human_name.first
+            data['issued_to_last_name'] = human_name.last
+        data['badge_template_id'] = badge_template_id
+        data['issued_at']
+        data['suppress_badge_notification_email'] = suppress_badge_notification_email
+        if locale:
+            data['locale'] = locale
+        url = self.BADGE_URL % self.organization_id
+        result = self._make_call(url, post_data=data)
+        result = IAwardedAcclaimBadge(result.json())
+        return result
+

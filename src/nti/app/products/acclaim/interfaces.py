@@ -23,13 +23,38 @@ from nti.coremetadata.interfaces import IShouldHaveTraversablePath
 
 from nti.schema.field import Int
 from nti.schema.field import Bool
-from nti.schema.field import Number
 from nti.schema.field import Object
 from nti.schema.field import HTTPURL
 from nti.schema.field import ValidText
 from nti.schema.field import ListOrTuple
 from nti.schema.field import ValidDatetime
 from nti.schema.field import DecodingValidTextLine as ValidTextLine
+
+
+class IAcclaimOrganization(IShouldHaveTraversablePath, IAttributeAnnotatable):
+    """
+    An Acclaim organization.
+    """
+
+    organization_id = ValidTextLine(title=u'acclaim organization id',
+                                    min_length=1,
+                                    required=True)
+
+    name = ValidTextLine(title=u'organization name',
+                         min_length=1,
+                         required=False)
+
+    photo_url = ValidTextLine(title=u'Photo url',
+                              min_length=1,
+                              required=False)
+
+    website_url = ValidTextLine(title=u'Website url',
+                                min_length=1,
+                                required=False)
+
+    contact_email = ValidTextLine(title=u'Contact email',
+                                  min_length=1,
+                                  required=False)
 
 
 class IAcclaimIntegration(IIntegration, ICreated, ILastModified, IShouldHaveTraversablePath):
@@ -39,13 +64,29 @@ class IAcclaimIntegration(IIntegration, ICreated, ILastModified, IShouldHaveTrav
 
     authorization_token = ValidTextLine(title=u'authorization token',
                                         description=u"Acclaim integration authorization token",
-                                        min_length=1)
+                                        min_length=1,
+                                        required=True)
+
+    organization = Object(IAcclaimOrganization,
+                          title=u'The Acclaim organization tied to this integration.',
+                          required=False)
 
 
 class IAcclaimClient(interface.Interface):
     """
-    A webinar client to fetch webinar information.
+    An Acclaim client to fetch webinar information. The client is tied to a
+    specific authorization_token. All badge calls must have an organization id.
     """
+
+    def get_organization(organization_id):
+        """
+        Get the :class:`IAcclaimOrganization` for this organization id.
+        """
+
+    def get_organizations():
+        """
+        Get all :class:`IAcclaimOrganization` objects.
+        """
 
     def get_badge(badge_template_id):
         """
@@ -73,18 +114,15 @@ class IAcclaimClient(interface.Interface):
         https://www.youracclaim.com/docs/issued_badges
         """
 
-    def revoke_badge(user, badge_id, reason):
-        """
-        Revoke a badge awarded to a user.
-
-        https://www.youracclaim.com/docs/issued_badges#revoke-a-badge
-        """
-
 
 class IAcclaimBadge(IShouldHaveTraversablePath, IAttributeAnnotatable):
     """
     An Acclaim badge template.
     """
+
+    organization_id = ValidTextLine(title=u'acclaim organization',
+                                    min_length=1,
+                                    required=True)
 
     template_id = ValidText(title=u"Template id",
                             required=True)
@@ -170,7 +208,7 @@ class IAcclaimBadgeCollection(interface.Interface):
                                required=False)
 
 
-class IAwardedAcclaimCollection(interface.Interface):
+class IAwardedAcclaimBadgeCollection(interface.Interface):
 
     badges = ListOrTuple(Object(IAwardedAcclaimBadge),
                          title=u"Awarded Acclaim badges",
@@ -178,8 +216,20 @@ class IAwardedAcclaimCollection(interface.Interface):
                          min_length=0)
 
 
+class IAcclaimOrganizationCollection(interface.Interface):
+
+    organizations = ListOrTuple(Object(IAcclaimOrganization),
+                                title=u"Acclaim organizations",
+                                required=True,
+                                min_length=0)
+
+
 class AcclaimClientError(Exception):
 
     def __init__(self, msg, json=None):
         Exception.__init__(self, msg)
         self.json = json
+
+
+class MissingAcclaimOrganizationError(Exception):
+    pass
