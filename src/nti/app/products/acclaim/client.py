@@ -115,10 +115,13 @@ class AcclaimClient(object):
         if not self.organization_id:
             raise MissingAcclaimOrganizationError()
         params = dict()
+        filters = dict(filters) if filters else dict()
+        filters['public'] = True
+        filters['state'] = 'active'
         if sort:
             params['sort'] = sort
         if filters:
-            params['filters'] = filters
+            params['filters'] = self._get_filter_str(filters)
         if page:
             params['page'] = page
         url = self.ORGANIZATION_ALL_BADGES_URL % self.organization_id
@@ -165,6 +168,7 @@ class AcclaimClient(object):
         params = dict()
         filters = dict(filters) if filters else dict()
         filters['user_id'] = self._get_user_id(user)
+        filters['public'] = True
         # Is this what we want?
         filters['state'] = 'pending,accepted'
         if sort:
