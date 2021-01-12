@@ -132,14 +132,9 @@ def _awarded_acclaim_badge_collection_factory(ext):
 @component.adapter(dict)
 @interface.implementer(IAcclaimOrganizationCollection)
 def _acclaim_organization_collection_factory(ext):
-    obj = AwardedAcclaimBadgeCollection()
-    metadata = ext['metadata']
+    obj = AcclaimOrganizationCollection()
     new_ext = dict()
-    new_ext['badges'] = [IAcclaimOrganization(x) for x in ext['data']]
-    new_ext['badges_count'] = metadata.get('count')
-    new_ext['total_badges_count'] = metadata.get('total_count')
-    new_ext['current_page'] = metadata.get('current_page')
-    new_ext['total_pages'] = metadata.get('total_pages')
+    new_ext['organizations'] = [IAcclaimOrganization(x) for x in ext['data']]
     update_from_external_object(obj, new_ext)
     return obj
 

@@ -147,3 +147,26 @@ class TestAcclaimClientInternalization(unittest.TestCase):
         assert_that(badge_ext, has_entries('organization_id', u'20be75f6-4b33-4609-a1dd-9c340afa1a8f',
                                            'template_id', u"09d1ac8b-d097-4ae4-844a-a2ae01d1bdbe",
                                            'description', u"Dynamically deliver go forward e-tailers"))
+
+    def test_organization(self):
+        template_json = self._load_resource('organization_collection.json')
+        collection = IAcclaimOrganizationCollection(template_json)
+        assert_that(collection, verifiably_provides(IAcclaimOrganizationCollection))
+        assert_that(collection.organizations, has_length(1))
+
+        org = collection.organizations[0]
+        assert_that(org, verifiably_provides(IAcclaimOrganization))
+        assert_that(org.organization_id, is_(u"ba92621f-f22c-41e5-9157-c2dc274e3cf0"))
+        assert_that(org.name, is_(u'Organization 8'))
+        assert_that(org.photo_url, is_(u"https://cdn.example.com/path/to/image.png"))
+        assert_that(org.website_url, is_(u"http://www.example.com/"))
+        assert_that(org.contact_email, is_(u"hello8@example.com"))
+
+        collection_ext = to_external_object(collection)
+        assert_that(collection_ext, has_entries('organizations', has_length(1)))
+        org_ext = collection_ext['organizations'][0]
+        assert_that(org_ext, has_entries('organization_id', u"ba92621f-f22c-41e5-9157-c2dc274e3cf0",
+                                         'name', u'Organization 8',
+                                         'photo_url', u"https://cdn.example.com/path/to/image.png",
+                                         'website_url', u"http://www.example.com/",
+                                         'contact_email', u"hello8@example.com"))
