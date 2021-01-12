@@ -151,6 +151,7 @@ class AcclaimIntegrationOrganizationsView(AbstractAuthenticatedView):
              permission=ACT_ACCLAIM,
              renderer='rest')
 class AcclaimIntegrationPutView(UGDPutView):
+    # FIXME Do org work
     pass
 
 
@@ -177,7 +178,6 @@ class AcclaimIntegrationDeleteView(AbstractAuthenticatedView):
         registry = component.getSiteManager()
         unregisterUtility(registry, provided=IAcclaimIntegration)
         return hexc.HTTPNoContent()
-
 
 
 @view_config(route_name='objects.generic.traversal',

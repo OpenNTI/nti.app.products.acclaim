@@ -13,6 +13,8 @@ import nameparser
 
 from base64 import b64encode
 
+from datetime import datetime
+
 from zope import component
 from zope import interface
 
@@ -151,6 +153,10 @@ class AcclaimClient(object):
         intids = component.getUtility(IIntIds)
         return intids.getId(user)
 
+    def _get_user_email(self, user):
+        result = IUserProfile(user).email
+        return result
+
     def _get_filter_str(self, filter_dict):
         result = ''
         for key, val in filter_dict.items():
@@ -167,9 +173,11 @@ class AcclaimClient(object):
             raise MissingAcclaimOrganizationError()
         params = dict()
         filters = dict(filters) if filters else dict()
-        filters['user_id'] = self._get_user_id(user)
+        # We want *all* badges tied to this user (by email) in Acclaim. The
+        # user may have multiple email addresses on their Acclaim account.
+        filters['recipient_email_all'] = self._get_user_email(user)
         filters['public'] = True
-        # Is this what we want?
+        # We only want pending or accepted badges (not revoked or rejected)
         filters['state'] = 'pending,accepted'
         if sort:
             params['sort'] = sort
@@ -190,12 +198,10 @@ class AcclaimClient(object):
         """
         if not self.organization_id:
             raise MissingAcclaimOrganizationError()
-        profile = IUserProfile(user)
         data = dict()
-        data['user_id'] = self._get_user_id(user)
-        # TODO: what email state is acceptable?
-        # if invalid email, do we award badges after user updates email?
-        data['recipient_email'] = profile.email
+        # We award this to our user's email address - no
+        # matter if invalid, bounced etc.
+        data['recipient_email'] = self._get_user_email(user)
 
         # TODO: Raise if no real name?
         friendly_named = IFriendlyNamed(user)
@@ -204,7 +210,8 @@ class AcclaimClient(object):
             data['issued_to_first_name'] = human_name.first
             data['issued_to_last_name'] = human_name.last
         data['badge_template_id'] = badge_template_id
-        data['issued_at']
+        data['issuer_earner_id'] = self._get_user_id(user)
+        data['issued_at'] = datetime.utcnow().isoformat()
         data['suppress_badge_notification_email'] = suppress_badge_notification_email
         if locale:
             data['locale'] = locale
