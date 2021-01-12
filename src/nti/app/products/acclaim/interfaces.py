@@ -132,7 +132,7 @@ class IAcclaimClient(interface.Interface):
         https://www.youracclaim.com/docs/issued_badges filtered by user email.
         """
 
-    def award_badge(user, badge_template_id, suppress_badge_notification_email, locale, evidence_ntiid):
+    def award_badge(user, badge_template_id, suppress_badge_notification_email=False, locale=None, evidence_ntiid=None):
         """
         Award a badge to a user.
 

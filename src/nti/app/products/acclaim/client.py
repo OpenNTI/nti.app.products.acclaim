@@ -178,7 +178,7 @@ class AcclaimClient(object):
         result = IAwardedAcclaimBadgeCollection(result.json())
         return result
 
-    def award_badge(self, user, badge_template_id, suppress_badge_notification_email=True, locale=None, evidence_ntiid=None):
+    def award_badge(self, user, badge_template_id, suppress_badge_notification_email=False, locale=None, evidence_ntiid=None):
         """
         Award a badge to a user.
 
