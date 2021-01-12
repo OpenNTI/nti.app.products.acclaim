@@ -15,6 +15,7 @@
     <include package="zope.security" file="meta.zcml" />
 
     <include package="nti.securitypolicy" file="meta.zcml"  />
+    <include package="nti.app.site" />
 
     <permission
         id="nti.actions.acclaim"
@@ -30,11 +31,18 @@
     <include package="nti.externalization" />
     <ext:registerAutoPackageIO
         root_interfaces=".interfaces.IAcclaimBadge
+                         .interfaces.IAcclaimIdEvidence
                          .interfaces.IAcclaimIntegration
-                         .interfaces.IAcclaimOrganization"
-        modules=".model" />
+                         .interfaces.IAwardedAcclaimBadge
+                         .interfaces.IAcclaimOrganization
+                         .interfaces.IAcclaimBadgeCollection
+                         .interfaces.IAwardedAcclaimBadgeCollection
+                         .interfaces.IAcclaimOrganizationCollection"
+        modules=".model .client_models" />
 
     <!-- Integration -->
+    <adapter factory=".client.integration_to_client" />
+
     <utility factory=".integration.AcclaimIntegrationProvider"
              name="acclaim" />
 
@@ -43,4 +51,33 @@
                 provides="nti.externalization.interfaces.IExternalMappingDecorator"
                 for=".interfaces.IAcclaimIntegration
                      pyramid.interfaces.IRequest" />
+
+    <!-- Internalization -->
+    <adapter factory=".client_models._acclaim_id_evidence_factory"
+             for="dict"
+             provides=".interfaces.IAcclaimIdEvidence" />
+
+    <adapter factory=".client_models._acclaim_organization_factory"
+             for="dict"
+             provides=".interfaces.IAcclaimOrganization" />
+
+    <adapter factory=".client_models._acclaim_badge_factory"
+             for="dict"
+             provides=".interfaces.IAcclaimBadge" />
+
+    <adapter factory=".client_models._awarded_acclaim_badge_factory"
+             for="dict"
+             provides=".interfaces.IAwardedAcclaimBadge" />
+
+    <adapter factory=".client_models._acclaim_badge_collection_factory"
+             for="dict"
+             provides=".interfaces.IAcclaimBadgeCollection" />
+
+    <adapter factory=".client_models._awarded_acclaim_badge_collection_factory"
+             for="dict"
+             provides=".interfaces.IAwardedAcclaimBadgeCollection" />
+
+    <adapter factory=".client_models._acclaim_organization_collection_factory"
+             for="dict"
+             provides=".interfaces.IAcclaimOrganizationCollection" />
 </configure>

@@ -31,8 +31,8 @@ from nti.app.products.acclaim import MessageFactory as _
 
 from nti.app.products.acclaim.authorization import ACT_ACCLAIM
 
-from nti.app.products.acclaim.interfaces import IAcclaimIntegration,\
-    IAcclaimClient
+from nti.app.products.acclaim.interfaces import IAcclaimClient
+from nti.app.products.acclaim.interfaces import IAcclaimIntegration
 
 from nti.appserver.dataserver_pyramid_views import GenericGetView
 
@@ -44,6 +44,8 @@ from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import StandardExternalFields
 
 from nti.site.localutility import install_utility
+
+from nti.site.utils import unregisterUtility
 
 logger = __import__('logging').getLogger(__name__)
 
@@ -159,3 +161,19 @@ class AcclaimIntegrationPutView(UGDPutView):
              renderer='rest')
 class AcclaimIntegrationGetView(GenericGetView):
     pass
+
+
+@view_config(route_name='objects.generic.traversal',
+             context=IAcclaimIntegration,
+             request_method='DELETE',
+             permission=ACT_ACCLAIM,
+             renderer='rest')
+class AcclaimIntegrationDeleteView(AbstractAuthenticatedView):
+    """
+    Allow deleting (unauthorizing) a :class:`IWebinarAuthorizedIntegration`.
+    """
+
+    def __call__(self):
+        registry = component.getSiteManager()
+        unregisterUtility(registry, provided=IAcclaimIntegration)
+        return hexc.HTTPNoContent()

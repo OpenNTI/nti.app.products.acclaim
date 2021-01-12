@@ -1,0 +1,45 @@
+{
+  "data": [
+    {
+      "id": "ba92621f-f22c-41e5-9157-c2dc274e3cf0",
+      "name": "Organization 8",
+      "website_url": "http://www.example.com/",
+      "webhook_url": "https://example.com/webhook.asp",
+      "contact_email": "hello8@example.com",
+      "technical_contact_email": "person8@example.com",
+      "zip_or_postal_code": "55437",
+      "organization_type": "Dynamic Markets Engineering",
+      "bio": "Function-based eco-centric standardization gurus",
+      "twitter_url": "https://twitter.com/example",
+      "vanity_slug": "organization-8",
+      "facebook_url": "https://www.facebook.com/example",
+      "linked_in_url": "https://www.linkedin.com/example",
+      "linked_in_org_id": null,
+      "city": "Bloomington",
+      "address": "1313 Mockingbird Lane",
+      "primary_hex_color": null,
+      "support_email": "someEmail@example.com",
+      "support_url": "https://example.com",
+      "allowed_webhooks": [],
+      "enable_blockchain": false,
+      "print_method": null,
+      "pdf_id": null,
+      "linkedin_a2p_url": null,
+      "location": "1313 Mockingbird Lane Bloomington Minnesota 55437 United States",
+      "country": "United States",
+      "state_or_province": "Minnesota",
+      "created_at": "2014-04-01T14:41:00.000Z",
+      "updated_at": "2014-04-01T14:41:00.000Z",
+      "vanity_url": "https://localhost/org/organization-8",
+      "verified_at": "2018-04-08T17:57:34.595Z",
+      "verified": true,
+      "photo": {
+        "id": "18de8086-1d3b-4a73-acb5-de348744f6b6",
+        "url": "/system/test/images/18de8086-1d3b-4a73-acb5-de348744f6b6/large_fake-600x600.png"
+      },
+      "photo_url": "https://cdn.example.com/path/to/image.png"
+    }
+  ],
+  "metadata": {
+  }
+}

@@ -18,6 +18,8 @@ from zope import interface
 
 from zope.intid.interfaces import IIntIds
 
+from nti.app.products.acclaim import NT_EVIDENCE_NTIID_ID
+
 from nti.app.products.acclaim.interfaces import IAcclaimBadge
 from nti.app.products.acclaim.interfaces import IAcclaimClient
 from nti.app.products.acclaim.interfaces import AcclaimClientError
@@ -32,6 +34,8 @@ from nti.app.products.acclaim.interfaces import MissingAcclaimOrganizationError
 from nti.dataserver.users.interfaces import IUserProfile
 from nti.dataserver.users.interfaces import IFriendlyNamed
 
+from nti.ntiids.ntiids import is_valid_ntiid_string
+
 logger = __import__('logging').getLogger(__name__)
 
 
@@ -39,7 +43,7 @@ logger = __import__('logging').getLogger(__name__)
 @interface.implementer(IAcclaimClient)
 def integration_to_client(integration):
     if integration.authorization_token:
-        return AcclaimClient(integration.authorization_token)
+        return AcclaimClient(integration)
 
 
 @interface.implementer(IAcclaimClient)
@@ -57,10 +61,13 @@ class AcclaimClient(object):
 
     BADGE_URL = '/organizations/%s/badges'
 
-    def __init__(self, authorization_token):
-        self.authorization_token = authorization_token
+    def __init__(self, integration):
+        self.authorization_token = integration.authorization_token
         self.b64_token = b64encode(self.authorization_token)
-        self.organization_id = authorization_token.organization_id
+        org_id = None
+        if integration.organization:
+            org_id = integration.organization.organization_id
+        self.organization_id = org_id
 
     def _make_call(self, url, post_data=None, params=None, delete=False, acceptable_return_codes=None):
         if not acceptable_return_codes:
@@ -171,7 +178,7 @@ class AcclaimClient(object):
         result = IAwardedAcclaimBadgeCollection(result.json())
         return result
 
-    def award_badge(self, user, badge_template_id, suppress_badge_notification_email=True, locale=None):
+    def award_badge(self, user, badge_template_id, suppress_badge_notification_email=True, locale=None, evidence_ntiid=None):
         """
         Award a badge to a user.
 
@@ -197,6 +204,11 @@ class AcclaimClient(object):
         data['suppress_badge_notification_email'] = suppress_badge_notification_email
         if locale:
             data['locale'] = locale
+        if evidence_ntiid:
+            assert is_valid_ntiid_string(evidence_ntiid)
+            data['evidence'] = [{"type": "IdEvidence",
+                                 "title": NT_EVIDENCE_NTIID_ID,
+                                 "id": evidence_ntiid}]
         url = self.BADGE_URL % self.organization_id
         result = self._make_call(url, post_data=data)
         result = IAwardedAcclaimBadge(result.json())

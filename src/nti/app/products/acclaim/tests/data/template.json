@@ -1,0 +1,94 @@
+{
+  "data": {
+    "id": "823a5e0c-1d8d-4801-a5c8-bd4e3a776a4c",
+    "allow_duplicate_badges": true,
+    "cost": null,
+    "description": "Dynamically deliver go forward e-tailers",
+    "global_activity_url": "https://www.example.com/foo",
+    "level": null,
+    "lock_badge_state": false,
+    "name": "Badge Template 7",
+    "state": "active",
+    "public": true,
+    "badges_count": 0,
+    "recipient_type": "User",
+    "send_expiring_badge_notifications": false,
+    "show_badge_lmi": false,
+    "show_lmi_jobs": false,
+    "show_skill_tag_links": true,
+    "vanity_slug": "badge-template-7",
+    "record_to_blockchain": null,
+    "time_to_earn": null,
+    "type_category": null,
+    "printing_disabled": false,
+    "visibility": "public",
+    "criteria_url_name": null,
+    "criteria_url": null,
+    "certification": true,
+    "state_updated_at": null,
+    "created_at": "2014-04-01T14:41:00.000Z",
+    "updated_at": "2014-04-01T14:41:00.000Z",
+    "show_template_settings": true,
+    "get_issue_count": 0,
+    "image": {
+      "id": "f032be87-358b-4ec0-a644-1b08427085db",
+      "url": "https://cdn.example.com/path/to/image.png"
+    },
+    "image_url": "https://cdn.example.com/path/to/image.png",
+    "url": "https://www.youracclaim.com/org/organization-5/badge/badge-template-7",
+    "owner": {
+      "type": "Organization",
+      "id": "b4deef45-9e00-4809-be6b-a6835a8f350e",
+      "name": "Organization 5",
+      "enable_blockchain": false,
+      "url": "https://api.youracclaim.com/v1/organizations/b4deef45-9e00-4809-be6b-a6835a8f350e",
+      "vanity_url": "https://www.youracclaim.com/org/organization-5",
+      "vanity_slug": "organization-5",
+      "verified": true,
+      "viewable": true
+    },
+    "alignments": [
+      {
+        "id": "d78412c2-8fce-4426-9b75-a95e3940e21a",
+        "name": "Alignment 9",
+        "url": "http://www.example.com/alignment",
+        "description": "Self-enabling cohesive task-force"
+      }
+    ],
+    "recommendations": [
+      {
+        "id": "1708042b-f4cd-4825-ba72-54e6bc1e5ab0",
+        "title": "Recommendation Title",
+        "type": "information",
+        "activity_url": "http://www.example.com/recommendation"
+      }
+    ],
+    "required_badge_templates": [
+
+    ],
+    "badge_template_activities": [
+      {
+        "id": "ba50438c-5f3e-46bc-a32a-2f66c1d3059d",
+        "title": "Kickboxing Activity",
+        "activity_type": "Schedule / Registration",
+        "activity_url": "http://www.example.com/awesomepage",
+        "required_badge_template_id": null
+      }
+    ],
+    "skills": [
+      "Skill 9"
+    ],
+    "reporting_tags": [
+      "expert",
+      "retail"
+    ],
+    "recommending_templates": [
+
+    ],
+    "criterion_for": [
+
+    ]
+  },
+  "metadata": {
+  }
+}

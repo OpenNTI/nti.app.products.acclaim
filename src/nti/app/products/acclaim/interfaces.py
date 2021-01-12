@@ -31,6 +31,31 @@ from nti.schema.field import ValidDatetime
 from nti.schema.field import DecodingValidTextLine as ValidTextLine
 
 
+class IAcclaimEvidence(interface.Interface):
+    """
+    An Acclaim badge evidence.
+    """
+
+    type = ValidTextLine(title=u'acclaim evidence type',
+                          min_length=1,
+                          required=True)
+
+
+class IAcclaimIdEvidence(IAcclaimEvidence):
+    """
+    An Acclaim badge evidence.
+    """
+
+    ntiid = ValidTextLine(title=u'acclaim organization id',
+                          min_length=1,
+                          required=True)
+
+
+    name = ValidTextLine(title=u'acclaim evidence name',
+                         min_length=1,
+                         required=False)
+
+
 class IAcclaimOrganization(IShouldHaveTraversablePath, IAttributeAnnotatable):
     """
     An Acclaim organization.
@@ -107,10 +132,11 @@ class IAcclaimClient(interface.Interface):
         https://www.youracclaim.com/docs/issued_badges filtered by user email.
         """
 
-    def award_badge(user, badge_template_id, suppress_badge_notification_email, locale):
+    def award_badge(user, badge_template_id, suppress_badge_notification_email, locale, evidence_ntiid):
         """
         Award a badge to a user.
 
+        evidence_ntiid - ntiid of object awarding the badge
         https://www.youracclaim.com/docs/issued_badges
         """
 
@@ -184,13 +210,24 @@ class IAwardedAcclaimBadge(IShouldHaveTraversablePath, IAttributeAnnotatable):
     recipient_email = ValidTextLine(title=u"Badge user email",
                                     required=True)
 
+    accept_badge_url = HTTPURL(title=u"Accept badge URL",
+                               required=False)
 
-class IAcclaimBadgeCollection(interface.Interface):
+    state = ValidTextLine(title=u"Badge state",
+                          description=u"State - pending, accepted, revoked, rejected",
+                          required=False)
 
-    badges = ListOrTuple(Object(IAcclaimBadge),
-                         title=u"Acclaim badges",
-                         required=True,
-                         min_length=0)
+    evidence = ListOrTuple(Object(IAcclaimEvidence),
+                           title=u"Acclaim awarded badge evidence",
+                           required=True,
+                           min_length=0)
+
+
+
+class IBadgePageMetadata(interface.Interface):
+    """
+    Badge page metadata.
+    """
 
     badges_count = Int(title=u"Badge count",
                        required=True)
@@ -204,11 +241,16 @@ class IAcclaimBadgeCollection(interface.Interface):
     total_pages = Int(title=u"Total page count",
                       required=True)
 
-    accept_badge_url = HTTPURL(title=u"Accept badge URL",
-                               required=False)
+
+class IAcclaimBadgeCollection(IBadgePageMetadata):
+
+    badges = ListOrTuple(Object(IAcclaimBadge),
+                         title=u"Acclaim badges",
+                         required=True,
+                         min_length=0)
 
 
-class IAwardedAcclaimBadgeCollection(interface.Interface):
+class IAwardedAcclaimBadgeCollection(IBadgePageMetadata):
 
     badges = ListOrTuple(Object(IAwardedAcclaimBadge),
                          title=u"Awarded Acclaim badges",

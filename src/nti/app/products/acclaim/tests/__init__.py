@@ -20,7 +20,8 @@ class SharedConfiguringTestLayer(ZopeComponentLayer,
                                  GCLayerMixin,
                                  ConfiguringLayerMixin):
 
-    set_up_packages = ('nti.app.products.acclaim',)
+    set_up_packages = ('nti.dataserver',
+                       'nti.app.products.acclaim',)
 
     @classmethod
     def setUp(cls):
