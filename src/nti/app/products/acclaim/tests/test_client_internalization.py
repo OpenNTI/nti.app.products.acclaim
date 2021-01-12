@@ -115,6 +115,7 @@ class TestAcclaimClientInternalization(unittest.TestCase):
         assert_that(awarded_badge.public, is_(True))
         assert_that(awarded_badge.state, is_('accepted'))
         assert_that(awarded_badge.image_url, is_(u"https://cdn.example.com/path/to/image.png"))
+        assert_that(awarded_badge.badge_url, is_(u"https://localhost/badges/749daf6e-4dbc-4b47-b401-b7e0477e0284"))
         assert_that(awarded_badge.created_at, not_none())
         assert_that(awarded_badge.updated_at, not_none())
         assert_that(awarded_badge.evidence, has_length(1))
@@ -133,6 +134,7 @@ class TestAcclaimClientInternalization(unittest.TestCase):
                                            'locale', u"en",
                                            'public', True,
                                            'state', 'accepted',
+                                           'badge_url', u"https://localhost/badges/749daf6e-4dbc-4b47-b401-b7e0477e0284",
                                            'image_url', u"https://cdn.example.com/path/to/image.png",
                                            'created_at', not_none(),
                                            'updated_at', not_none()))

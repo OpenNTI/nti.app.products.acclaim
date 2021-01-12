@@ -177,3 +177,21 @@ class AcclaimIntegrationDeleteView(AbstractAuthenticatedView):
         registry = component.getSiteManager()
         unregisterUtility(registry, provided=IAcclaimIntegration)
         return hexc.HTTPNoContent()
+
+
+
+@view_config(route_name='objects.generic.traversal',
+             context=IAcclaimIntegration,
+             request_method='GET',
+             permission=ACT_ACCLAIM,
+             renderer='rest')
+class AcclaimBadgesView(AbstractAuthenticatedView):
+    """
+    Get all badges from this acclaim account
+    """
+
+    def __call__(self):
+        client = IAcclaimClient(self.context)
+        registry = component.getSiteManager()
+        unregisterUtility(registry, provided=IAcclaimIntegration)
+        return hexc.HTTPNoContent()

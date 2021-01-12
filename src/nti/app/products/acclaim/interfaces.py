@@ -211,7 +211,12 @@ class IAwardedAcclaimBadge(IShouldHaveTraversablePath, IAttributeAnnotatable):
                                     required=True)
 
     accept_badge_url = HTTPURL(title=u"Accept badge URL",
+                               description=u"Should only have one of accept_badge_url or badge_url",
                                required=False)
+
+    badge_url = HTTPURL(title=u"Badge URL",
+                        description=u"Should only have one of accept_badge_url or badge_url",
+                        required=False)
 
     state = ValidTextLine(title=u"Badge state",
                           description=u"State - pending, accepted, revoked, rejected",
