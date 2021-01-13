@@ -93,7 +93,7 @@ class AcclaimIntegrationUpdateMixin(object):
         organizations = organizations.organizations
         if len(organizations) == 1:
             # Just one organization - set and use
-            integration.organization = organizations[1]
+            integration.organization = organizations[0]
             integration.organization.__parent__ = integration
             self._register_integration(integration)
         else:
