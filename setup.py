@@ -60,6 +60,7 @@ setup(
         'pyramid',
         'six',
         'nti.app.products.integration',
+        'nti.app.site',
         'nti.common',
         'nti.dataserver',
         'zope.component',

@@ -1,0 +1,185 @@
+{
+  "data": [
+    {
+      "user": {
+        "id": "46cd20e3-f1e8-4c0e-9a96-60152ced3000",
+        "email": "46cd20e3-f1e8-4c0e-9a96-60152ced3000@example.com",
+        "first_name": "Alfred",
+        "middle_name": "Beaker",
+        "last_name": "Skiles",
+        "current_position_name": "*****",
+        "current_organization_name": "*****",
+        "confirmed": true,
+        "photo": null,
+        "photo_url": null,
+        "url": "https://www.youracclaim.com/users/alfred-beaker-skiles"
+      },
+      "created_by": {
+        "type": "Organization",
+        "id": "20be75f6-4b33-4609-a1dd-9c340afa1a8f",
+        "name": "Organization 1",
+        "url": "https://api.youracclaim.com/v1/organizations/20be75f6-4b33-4609-a1dd-9c340afa1a8f",
+        "vanity_url": "https://www.youracclaim.com/org/organization-1",
+        "verified": true
+      },
+      "issuer": {
+        "summary": "issued by Organization 1",
+        "entities": [
+          {
+            "label": "Issued by",
+            "primary": true,
+            "entity": {
+              "type": "Organization",
+              "id": "20be75f6-4b33-4609-a1dd-9c340afa1a8f",
+              "name": "Organization 1",
+              "url": "https://api.youracclaim.com/v1/organizations/20be75f6-4b33-4609-a1dd-9c340afa1a8f",
+              "vanity_url": "https://www.youracclaim.com/org/organization-1",
+              "verified": true
+            }
+          }
+        ]
+      },
+      "printing_enabled": false,
+      "print_method": null,
+      "badge_template": {
+        "id": "09d1ac8b-d097-4ae4-844a-a2ae01d1bdbe",
+        "allow_duplicate_badges": true,
+        "cost": null,
+        "description": "Dynamically deliver go forward e-tailers",
+        "global_activity_url": "https://www.example.com/foo",
+        "level": null,
+        "lock_badge_state": false,
+        "name": "Badge Template 1",
+        "state": "active",
+        "public": true,
+        "badges_count": 0,
+        "recipient_type": "User",
+        "send_expiring_badge_notifications": false,
+        "show_badge_lmi": false,
+        "show_lmi_jobs": false,
+        "show_skill_tag_links": true,
+        "vanity_slug": "badge-template-1",
+        "record_to_blockchain": null,
+        "time_to_earn": null,
+        "type_category": null,
+        "printing_disabled": false,
+        "visibility": "public",
+        "criteria_url_name": null,
+        "criteria_url": null,
+        "certification": true,
+        "state_updated_at": null,
+        "created_at": "2014-04-01T14:41:00.000Z",
+        "updated_at": "2014-04-01T14:41:00.000Z",
+        "show_template_settings": false,
+        "get_issue_count": 0,
+        "image": {
+          "id": "5ef66a91-3799-4ccd-a7f3-71f35714041d",
+          "url": "https://cdn.example.com/path/to/image.png"
+        },
+        "image_url": "https://cdn.example.com/path/to/image.png",
+        "url": "https://localhost/org/organization-1/badge/badge-template-1",
+        "owner": {
+          "type": "Organization",
+          "id": "20be75f6-4b33-4609-a1dd-9c340afa1a8f",
+          "name": "Organization 1",
+          "enable_blockchain": false,
+          "url": "https://api.youracclaim.com/v1/organizations/20be75f6-4b33-4609-a1dd-9c340afa1a8f",
+          "vanity_url": "https://localhost/org/organization-1",
+          "vanity_slug": "organization-1",
+          "verified": true,
+          "viewable": true
+        },
+        "alignments": [
+          {
+            "id": "4b901d3b-a448-42a0-938e-23c5b306c487",
+            "name": "Alignment 1",
+            "url": "http://www.example.com/alignment",
+            "description": "Self-enabling cohesive task-force"
+          }
+        ],
+        "recommendations": [
+          {
+            "id": "6836a63a-5078-49f1-95c8-10f9f2e83d3b",
+            "title": "Recommendation Title",
+            "type": "information",
+            "activity_url": "http://www.example.com/recommendation"
+          }
+        ],
+        "required_badge_templates": [
+
+        ],
+        "badge_template_activities": [
+          {
+            "id": "bd22eda5-e9a2-443c-8875-227fd44518b5",
+            "title": "Kickboxing Activity",
+            "activity_type": "Schedule / Registration",
+            "activity_url": "http://www.example.com/awesomepage",
+            "required_badge_template_id": null
+          }
+        ],
+        "skills": [
+          "Skill 1"
+        ]
+      },
+      "id": "749daf6e-4dbc-4b47-b401-b7e0477e0284",
+      "issued_to": "Alfred Beaker Skiles",
+      "issued_to_first_name": "Alfred",
+      "issued_to_middle_name": "Beaker",
+      "issued_to_last_name": "Skiles",
+      "issuer_earner_id": null,
+      "locale": "en",
+      "public": true,
+      "recipient_email": "user10001@example.com",
+      "replacement_badge_id": null,
+      "replaces_badge_id": null,
+      "revocation_reason": null,
+      "state": "accepted",
+      "suppress_badge_notification_email": false,
+      "updated_at": "2014-04-01T14:41:00.000Z",
+      "country": "United States",
+      "country_code": "USA",
+      "state_or_province": "Minnesota",
+      "created_at": "2014-04-01T14:41:00.000Z",
+      "expires_at": "2016-04-01T14:41:00.000Z",
+      "expires_at_date": "2016-04-01",
+      "issued_at": "2014-04-01T14:41:00.000Z",
+      "issued_at_date": "2014-04-01",
+      "state_updated_at": "2017-09-18T12:14:51.331Z",
+      "image": {
+        "id": "5ef66a91-3799-4ccd-a7f3-71f35714041d",
+        "url": "https://cdn.example.com/path/to/image.png"
+      },
+      "image_url": "https://cdn.example.com/path/to/image.png",
+      "alignments": [
+        {
+          "name": "Alignment 1",
+          "description": "Self-enabling cohesive task-force"
+        }
+      ],
+      "evidence": [
+        {
+          "id": "83aee9be-57b6-4518-b8e3-1d5b5961a0b1",
+          "type": "UrlEvidence",
+          "name": "Acclaim",
+          "description": "Description in URL evidence is optional",
+          "value": "http://www.example.com/path-to-earner-specific-evidence"
+        },
+        {
+          "id": "tag:nextthought.com,2011-10:aaron.eskam@nextthought.com-OID-0x0c3a2781:5573657273:ScMA6PZxJDH",
+          "type": "IdEvidence",
+          "name": "NextThoughtEvidenceNTIID"
+        }
+      ],
+      "badge_url": "https://localhost/badges/749daf6e-4dbc-4b47-b401-b7e0477e0284"
+    }
+  ],
+  "metadata": {
+    "count": 1,
+    "current_page": 1,
+    "total_count": 1,
+    "total_pages": 1,
+    "per": 50,
+    "previous_page_url": null,
+    "next_page_url": null
+  }
+}

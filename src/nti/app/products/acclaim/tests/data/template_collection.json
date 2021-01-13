@@ -1,0 +1,190 @@
+{
+  "data": [
+    {
+      "id": "216a37a4-4a79-411f-811d-05d1b561d230",
+      "allow_duplicate_badges": true,
+      "cost": null,
+      "description": "Dynamically deliver go forward e-tailers",
+      "global_activity_url": "https://www.example.com/foo",
+      "level": null,
+      "lock_badge_state": false,
+      "name": "Badge Template 1",
+      "state": "active",
+      "public": true,
+      "badges_count": 0,
+      "recipient_type": "User",
+      "send_expiring_badge_notifications": false,
+      "show_badge_lmi": false,
+      "show_lmi_jobs": false,
+      "show_skill_tag_links": true,
+      "vanity_slug": "badge-template-1",
+      "record_to_blockchain": null,
+      "time_to_earn": null,
+      "type_category": null,
+      "printing_disabled": false,
+      "visibility": "public",
+      "criteria_url_name": null,
+      "criteria_url": null,
+      "certification": true,
+      "state_updated_at": null,
+      "created_at": "2014-04-01T14:41:00.000Z",
+      "updated_at": "2014-04-01T14:41:00.000Z",
+      "show_template_settings": false,
+      "get_issue_count": 0,
+      "image": {
+        "id": "73218b56-0713-4eeb-bdaa-939e010c1701",
+        "url": "https://cdn.example.com/path/to/image.png"
+      },
+      "image_url": "https://cdn.example.com/path/to/image.png",
+      "url": "https://www.youracclaim.com/org/organization-4/badge/badge-template-1",
+      "owner": {
+        "type": "Organization",
+        "id": "896bcba9-ff7a-46c5-a226-9dc0ab0d9a1a",
+        "name": "Organization 4",
+        "enable_blockchain": false,
+        "url": "https://api.youracclaim.com/v1/organizations/896bcba9-ff7a-46c5-a226-9dc0ab0d9a1a",
+        "vanity_url": "https://www.youracclaim.com/org/organization-4",
+        "vanity_slug": "organization-4",
+        "verified": true,
+        "viewable": true
+      },
+      "alignments": [
+        {
+          "id": "7189030d-48c9-4171-a5c8-1452b59536e7",
+          "name": "Alignment 7",
+          "url": "http://www.example.com/alignment",
+          "description": "Self-enabling cohesive task-force"
+        }
+      ],
+      "recommendations": [
+        {
+          "id": "f110095f-d0d2-4a4b-ba79-241476c2cb1e",
+          "title": "Recommendation Title",
+          "type": "information",
+          "activity_url": "http://www.example.com/recommendation"
+        }
+      ],
+      "required_badge_templates": [
+
+      ],
+      "badge_template_activities": [
+        {
+          "id": "307425d1-f3bd-4d7e-8503-4c0960d1d829",
+          "title": "Kickboxing Activity",
+          "activity_type": "Schedule / Registration",
+          "activity_url": "http://www.example.com/awesomepage",
+          "required_badge_template_id": null
+        },
+        {
+          "id": "638db9f4-e891-4eb8-bf00-87c8a61f0159",
+          "title": "Badge Template 2",
+          "activity_type": "Badge",
+          "activity_url": null,
+          "required_badge_template_id": "f0766662-ff40-4537-9f80-bd9f0a0af2dc",
+          "required_badge_template_name": "Badge Template 2",
+          "required_badge_template_url": "http://www.youracclaim.com/org/organization-4/badge/badge-template-2"
+        }
+      ],
+      "skills": [
+        "Skill 7"
+      ],
+      "reporting_tags": [
+        "expert",
+        "retail"
+      ]
+    },
+    {
+      "id": "f0766662-ff40-4537-9f80-bd9f0a0af2dc",
+      "allow_duplicate_badges": true,
+      "cost": null,
+      "description": "Dynamically deliver go forward e-tailers",
+      "global_activity_url": "https://www.example.com/foo",
+      "level": null,
+      "lock_badge_state": false,
+      "name": "Badge Template 2",
+      "state": "active",
+      "public": true,
+      "badges_count": 0,
+      "recipient_type": "User",
+      "send_expiring_badge_notifications": false,
+      "show_badge_lmi": false,
+      "show_lmi_jobs": false,
+      "show_skill_tag_links": true,
+      "vanity_slug": "badge-template-2",
+      "record_to_blockchain": null,
+      "time_to_earn": null,
+      "type_category": null,
+      "printing_disabled": false,
+      "visibility": "public",
+      "criteria_url_name": null,
+      "criteria_url": null,
+      "certification": true,
+      "state_updated_at": null,
+      "created_at": "2014-04-01T14:41:00.000Z",
+      "updated_at": "2014-04-01T14:41:00.000Z",
+      "show_template_settings": false,
+      "get_issue_count": 0,
+      "image": {
+        "id": "313ab318-d30d-4dae-86cc-f35e4c08c1f0",
+        "url": "https://cdn.example.com/path/to/image.png"
+      },
+      "image_url": "https://cdn.example.com/path/to/image.png",
+      "url": "https://www.youracclaim.com/org/organization-4/badge/badge-template-2",
+      "owner": {
+        "type": "Organization",
+        "id": "896bcba9-ff7a-46c5-a226-9dc0ab0d9a1a",
+        "name": "Organization 4",
+        "enable_blockchain": false,
+        "url": "https://api.youracclaim.com/v1/organizations/896bcba9-ff7a-46c5-a226-9dc0ab0d9a1a",
+        "vanity_url": "https://www.youracclaim.com/org/organization-4",
+        "vanity_slug": "organization-4",
+        "verified": true,
+        "viewable": true
+      },
+      "alignments": [
+        {
+          "id": "85e64534-11ef-4524-a910-f5bd2c857770",
+          "name": "Alignment 8",
+          "url": "http://www.example.com/alignment",
+          "description": "Self-enabling cohesive task-force"
+        }
+      ],
+      "recommendations": [
+        {
+          "id": "ea2d8428-06dc-49a2-be1e-52f9bb2b628d",
+          "title": "Recommendation Title",
+          "type": "information",
+          "activity_url": "http://www.example.com/recommendation"
+        }
+      ],
+      "required_badge_templates": [
+
+      ],
+      "badge_template_activities": [
+        {
+          "id": "7ecdb3d7-7d2a-415b-9525-465fc984a231",
+          "title": "Kickboxing Activity",
+          "activity_type": "Schedule / Registration",
+          "activity_url": "http://www.example.com/awesomepage",
+          "required_badge_template_id": null
+        }
+      ],
+      "skills": [
+        "Skill 8"
+      ],
+      "reporting_tags": [
+        "expert",
+        "retail"
+      ]
+    }
+  ],
+  "metadata": {
+    "count": 2,
+    "current_page": 1,
+    "total_count": 2,
+    "total_pages": 1,
+    "per": 50,
+    "previous_page_url": null,
+    "next_page_url": null
+  }
+}
