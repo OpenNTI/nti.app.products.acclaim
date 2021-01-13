@@ -62,30 +62,7 @@ def raise_error(data, tb=None,
     raise_json_error(request, factory, data, tb)
 
 
-@view_config(route_name='objects.generic.traversal',
-             renderer='rest',
-             context=IHostPolicyFolder,
-             request_method='POST',
-             name=ENABLE_ACCLAIM_VIEW,
-             permission=ACT_ACCLAIM)
-class EnableAcclaimIntegrationView(AbstractAuthenticatedView,
-                                   ModeledContentUploadRequestUtilsMixin):
-    """
-    Enable the acclaim integration
-    """
-
-    DEFAULT_FACTORY_MIMETYPE = "application/vnd.nextthought.site.acclaimintegration"
-
-    def readInput(self, value=None):
-        if self.request.body:
-            values = super(EnableAcclaimIntegrationView, self).readInput(value)
-        else:
-            values = self.request.params
-        values = dict(values)
-        # Can't be CaseInsensitive with internalization
-        if MIMETYPE not in values:
-            values[MIMETYPE] = self.DEFAULT_FACTORY_MIMETYPE
-        return values
+class AcclaimIntegrationUpdateMixin(object):
 
     @Lazy
     def site(self):
@@ -103,6 +80,53 @@ class EnableAcclaimIntegrationView(AbstractAuthenticatedView,
                         local_site_manager=self.site_manager)
         return obj
 
+    def _unregister_integration(self):
+        registry = component.getSiteManager()
+        unregisterUtility(registry, provided=IAcclaimIntegration)
+
+    def _get_organizations(self, integration):
+        client = IAcclaimClient(integration)
+        return client.get_organizations()
+
+    def set_organization(self, integration):
+        organizations = self._get_organizations()
+        if len(organizations) == 1:
+            # Just one organization - set and use
+            integration.organization = organizations[1]
+            self._register_integration(integration)
+        else:
+            logger.warn("Multiple organizations tied to auth token (%s) (%s)",
+                        integration.authorization_token,
+                        organizations)
+        return integration
+
+
+@view_config(route_name='objects.generic.traversal',
+             renderer='rest',
+             context=IHostPolicyFolder,
+             request_method='POST',
+             name=ENABLE_ACCLAIM_VIEW,
+             permission=ACT_ACCLAIM)
+class EnableAcclaimIntegrationView(AbstractAuthenticatedView,
+                                   ModeledContentUploadRequestUtilsMixin,
+                                   AcclaimIntegrationUpdateMixin):
+    """
+    Enable the acclaim integration
+    """
+
+    DEFAULT_FACTORY_MIMETYPE = "application/vnd.nextthought.site.acclaimintegration"
+
+    def readInput(self, value=None):
+        if self.request.body:
+            values = super(EnableAcclaimIntegrationView, self).readInput(value)
+        else:
+            values = self.request.params
+        values = dict(values)
+        # Can't be CaseInsensitive with internalization
+        if MIMETYPE not in values:
+            values[MIMETYPE] = self.DEFAULT_FACTORY_MIMETYPE
+        return values
+
     def _do_call(self):
         logger.info("Integration acclaim for site (%s) (%s)",
                     self.site.__name__, self.remoteUser)
@@ -114,19 +138,40 @@ class EnableAcclaimIntegrationView(AbstractAuthenticatedView,
         if integration.organization:
             result = self._register_integration(integration)
         else:
-            client = IAcclaimClient(integration)
-            organizations = client.get_organizations()
-            if len(organizations) == 1:
-                # Just one organization - set and use
-                integration.organization = organizations[1]
-                result = self._register_integration(integration)
-            else:
-                logger.info("Multiple organizations tied to auth token (%s) (%s)",
-                            integration.authorization_token,
-                            organizations)
-                # No organization - so return the set
-                result = organizations
+            result = self.set_organization(integration)
         return result
+
+
+@view_config(route_name='objects.generic.traversal',
+             context=IAcclaimIntegration,
+             request_method='PUT',
+             permission=ACT_ACCLAIM,
+             renderer='rest')
+class AcclaimIntegrationPutView(UGDPutView,
+                                AcclaimIntegrationUpdateMixin):
+
+    def updateContentObject(self, obj, externalValue):
+        super(AcclaimIntegrationPutView, self).updateContentObject(obj, externalValue)
+        # If changing authorization token, refresh organization.
+        if 'authorization_token' in externalValue:
+            self.set_organization(obj)
+        return obj
+
+
+@view_config(route_name='objects.generic.traversal',
+             context=IAcclaimIntegration,
+             request_method='DELETE',
+             permission=ACT_ACCLAIM,
+             renderer='rest')
+class AcclaimIntegrationDeleteView(AbstractAuthenticatedView,
+                                   AcclaimIntegrationUpdateMixin):
+    """
+    Allow deleting (unauthorizing) a :class:`IWebinarAuthorizedIntegration`.
+    """
+
+    def __call__(self):
+        self._unregister_integration()
+        return hexc.HTTPNoContent()
 
 
 @view_config(route_name='objects.generic.traversal',
@@ -148,37 +193,11 @@ class AcclaimIntegrationOrganizationsView(AbstractAuthenticatedView):
 
 @view_config(route_name='objects.generic.traversal',
              context=IAcclaimIntegration,
-             request_method='PUT',
-             permission=ACT_ACCLAIM,
-             renderer='rest')
-class AcclaimIntegrationPutView(UGDPutView):
-    # FIXME Do org work
-    pass
-
-
-@view_config(route_name='objects.generic.traversal',
-             context=IAcclaimIntegration,
              request_method='GET',
              permission=ACT_ACCLAIM,
              renderer='rest')
 class AcclaimIntegrationGetView(GenericGetView):
     pass
-
-
-@view_config(route_name='objects.generic.traversal',
-             context=IAcclaimIntegration,
-             request_method='DELETE',
-             permission=ACT_ACCLAIM,
-             renderer='rest')
-class AcclaimIntegrationDeleteView(AbstractAuthenticatedView):
-    """
-    Allow deleting (unauthorizing) a :class:`IWebinarAuthorizedIntegration`.
-    """
-
-    def __call__(self):
-        registry = component.getSiteManager()
-        unregisterUtility(registry, provided=IAcclaimIntegration)
-        return hexc.HTTPNoContent()
 
 
 @view_config(route_name='objects.generic.traversal',
