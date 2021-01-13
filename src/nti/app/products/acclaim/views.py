@@ -22,6 +22,7 @@ from nti.app.base.abstract_views import AbstractAuthenticatedView
 
 from nti.app.externalization.error import raise_json_error
 
+from nti.app.externalization.view_mixins import BatchingUtilsMixin
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
 from nti.app.products.acclaim import ENABLE_ACCLAIM_VIEW
@@ -183,15 +184,18 @@ class AcclaimIntegrationDeleteView(AbstractAuthenticatedView):
 @view_config(route_name='objects.generic.traversal',
              context=IAcclaimIntegration,
              request_method='GET',
+             name='badges',
              permission=ACT_ACCLAIM,
              renderer='rest')
-class AcclaimBadgesView(AbstractAuthenticatedView):
+class AcclaimBadgesView(AbstractAuthenticatedView,
+                        BatchingUtilsMixin):
     """
     Get all badges from this acclaim account
+
+    TODO: Sorting, paging, filtering?
     """
 
     def __call__(self):
         client = IAcclaimClient(self.context)
-        registry = component.getSiteManager()
-        unregisterUtility(registry, provided=IAcclaimIntegration)
-        return hexc.HTTPNoContent()
+        collection = client.get_badges(sort=None, filters=None, page=None)
+        return collection
