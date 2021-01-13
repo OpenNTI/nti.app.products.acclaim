@@ -89,10 +89,11 @@ class AcclaimIntegrationUpdateMixin(object):
         return client.get_organizations()
 
     def set_organization(self, integration):
-        organizations = self._get_organizations()
+        organizations = self._get_organizations(integration)
         if len(organizations) == 1:
             # Just one organization - set and use
             integration.organization = organizations[1]
+            integration.organization.__parent__ = integration
             self._register_integration(integration)
         else:
             logger.warn("Multiple organizations tied to auth token (%s) (%s)",
