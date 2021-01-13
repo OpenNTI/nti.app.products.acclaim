@@ -50,12 +50,17 @@ class _AcclaimEnableIntegrationDecorator(AbstractAuthenticatedRequestAwareDecora
         current_site = getSite()
         return super(_AcclaimEnableIntegrationDecorator, self)._predicate(context, unused_result) \
            and has_permission(ACT_ACCLAIM, current_site, self.request) \
-           and not context.authorization_token
 
-    def _do_decorate_external(self, unused_context, result):
+    def _do_decorate_external(self, context, result):
         links = result.setdefault(LINKS, [])
-        link_context = getSite()
-        link = Link(link_context,
-                    elements=("@@" + ENABLE_ACCLAIM_VIEW,),
-                    rel='enable')
-        links.append(located_link(link_context, link))
+        if not context.authorization_token:
+            link_context = getSite()
+            link = Link(link_context,
+                        elements=("@@" + ENABLE_ACCLAIM_VIEW,),
+                        rel='enable')
+            links.append(located_link(link_context, link))
+        else:
+            link = Link(context,
+                        rel='disconnect',
+                        method='DELETE')
+            links.append(located_link(context, link))
