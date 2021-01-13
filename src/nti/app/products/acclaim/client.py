@@ -54,7 +54,8 @@ class AcclaimClient(object):
     The client to interact with acclaim.
     """
 
-    BASE_URL = 'https://api.youracclaim.com/v1'
+    # FIXME
+    BASE_URL = 'https://sandbox.youracclaim.com/v1'
 
     ORGANIZATIONS_URL = '/organizations'
     ORGANIZATIONS_ORG_URL = '/organizations/%s'
@@ -65,7 +66,9 @@ class AcclaimClient(object):
 
     def __init__(self, integration):
         self.authorization_token = integration.authorization_token
-        self.b64_token = b64encode(self.authorization_token)
+        # The authorization token is effectively the username; encode
+        # with an empty password
+        self.b64_token = b64encode('%s:' % self.authorization_token)
         org_id = None
         if integration.organization:
             org_id = integration.organization.organization_id
@@ -76,7 +79,7 @@ class AcclaimClient(object):
             acceptable_return_codes = (200,)
         url = '%s%s' % (self.BASE_URL, url)
 
-        access_header = 'Bearer %s' % self.b64_token
+        access_header = 'Basic %s' % self.b64_token
         if post_data:
             response = requests.post(url,
                                      json=post_data,
