@@ -90,6 +90,7 @@ class AcclaimIntegrationUpdateMixin(object):
 
     def set_organization(self, integration):
         organizations = self._get_organizations(integration)
+        organizations = organizations.organizations
         if len(organizations) == 1:
             # Just one organization - set and use
             integration.organization = organizations[1]
