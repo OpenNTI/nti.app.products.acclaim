@@ -125,10 +125,11 @@ class IAcclaimClient(interface.Interface):
         https://www.youracclaim.com/docs/badge_templates
         """
 
-    def get_awarded_badges(user, sort=None, filters=None, page=None):
+    def get_awarded_badges(user, sort=None, filters=None, page=None, public_only=None):
         """
         Return an :class:`IAwardedAcclaimBadgeCollection`.
 
+        public_only - only return public badges
         https://www.youracclaim.com/docs/issued_badges filtered by user email.
         """
 
@@ -278,5 +279,16 @@ class AcclaimClientError(Exception):
         self.json = json
 
 
-class MissingAcclaimOrganizationError(Exception):
-    pass
+class InvalidAcclaimIntegrationError(AcclaimClientError):
+    """
+    Raised when an acclaim integration is invalid, most likely an
+    invalid authorization_token.
+    """
+
+
+class MissingAcclaimOrganizationError(AcclaimClientError):
+    """
+    Raised when an acclaim integration is not tied to an organization.
+    This should not happen. Integrations should only make API calls
+    if persistent and tied to an organization.
+    """
