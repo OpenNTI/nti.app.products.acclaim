@@ -18,9 +18,14 @@ from datetime import datetime
 from zope import component
 from zope import interface
 
+from zope.cachedescriptors.property import Lazy
+
+from zope.component.hooks import getSite
+
 from zope.intid.interfaces import IIntIds
 
 from nti.app.products.acclaim import NT_EVIDENCE_NTIID_ID
+from nti.app.products.acclaim import ACCLAIM_INTEGRATION_NAME
 
 from nti.app.products.acclaim.interfaces import IAcclaimBadge
 from nti.app.products.acclaim.interfaces import IAcclaimClient
@@ -29,6 +34,7 @@ from nti.app.products.acclaim.interfaces import IAcclaimIntegration
 from nti.app.products.acclaim.interfaces import IAwardedAcclaimBadge
 from nti.app.products.acclaim.interfaces import IAcclaimOrganization
 from nti.app.products.acclaim.interfaces import IAcclaimBadgeCollection
+from nti.app.products.acclaim.interfaces import IAcclaimInitializationUtility
 from nti.app.products.acclaim.interfaces import InvalidAcclaimIntegrationError
 from nti.app.products.acclaim.interfaces import IAwardedAcclaimBadgeCollection
 from nti.app.products.acclaim.interfaces import IAcclaimOrganizationCollection
@@ -38,6 +44,8 @@ from nti.dataserver.users.interfaces import IUserProfile
 from nti.dataserver.users.interfaces import IFriendlyNamed
 
 from nti.ntiids.ntiids import is_valid_ntiid_string
+
+from nti.site.localutility import install_utility
 
 logger = __import__('logging').getLogger(__name__)
 
@@ -49,14 +57,73 @@ def integration_to_client(integration):
         return AcclaimClient(integration)
 
 
+@interface.implementer(IAcclaimInitializationUtility)
+class _AcclaimInitializationUtility(object):
+
+    BASE_URLS = ('https://api.youracclaim.com/v1',
+                 'https://sandbox.youracclaim.com/v1')
+
+    @Lazy
+    def site(self):
+        return getSite()
+
+    @Lazy
+    def site_manager(self):
+        return self.site.getSiteManager()
+
+    def _register_integration(self, obj):
+        obj.__name__ = ACCLAIM_INTEGRATION_NAME
+        install_utility(obj,
+                        utility_name=obj.__name__,
+                        provided=IAcclaimIntegration,
+                        local_site_manager=self.site_manager)
+        return obj
+
+    def _get_organizations(self, integration):
+        client = IAcclaimClient(integration)
+        return client.get_organizations()
+
+    def set_organization(self, integration):
+        """
+        Fetch organizations, which should be a single entry.
+
+        Raises :class:`InvalidAcclaimIntegrationError` if token is invalid.
+        """
+        organizations = self._get_organizations(integration)
+        organizations = organizations.organizations
+        if len(organizations) == 1:
+            # Just one organization - set and use
+            integration.organization = organizations[0]
+            integration.organization.__parent__ = integration
+            self._register_integration(integration)
+        else:
+            logger.warn("Multiple organizations tied to auth token (%s) (%s)",
+                        integration.authorization_token,
+                        organizations)
+        return integration
+
+    def initialize(self, integration):
+        """
+        We have two possible API urls; try both. If successful, integration
+        will have url and organization stored on it for future API calls.
+        """
+        invalid_exception = None
+        for base_url in self.BASE_URLS:
+            integration.base_url = base_url
+            try:
+                self.set_organization(integration)
+            except InvalidAcclaimIntegrationError as exc:
+                invalid_exception = exc
+            else:
+                return integration
+        raise invalid_exception
+
+
 @interface.implementer(IAcclaimClient)
 class AcclaimClient(object):
     """
     The client to interact with acclaim.
     """
-
-    # FIXME register util for this
-    BASE_URL = 'https://sandbox.youracclaim.com/v1'
 
     ORGANIZATIONS_URL = '/organizations'
     ORGANIZATIONS_ORG_URL = '/organizations/%s'
@@ -74,11 +141,12 @@ class AcclaimClient(object):
         if integration.organization:
             org_id = integration.organization.organization_id
         self.organization_id = org_id
+        self.base_url = integration.base_url
 
     def _make_call(self, url, post_data=None, params=None, delete=False, acceptable_return_codes=None):
         if not acceptable_return_codes:
             acceptable_return_codes = (200,)
-        url = '%s%s' % (self.BASE_URL, url)
+        url = '%s%s' % (self.base_url, url)
 
         access_header = 'Basic %s' % self.b64_token
         if post_data:

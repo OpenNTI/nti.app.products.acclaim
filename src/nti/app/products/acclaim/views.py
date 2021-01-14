@@ -27,7 +27,6 @@ from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtils
 
 from nti.app.products.acclaim import BADGES
 from nti.app.products.acclaim import ENABLE_ACCLAIM_VIEW
-from nti.app.products.acclaim import ACCLAIM_INTEGRATION_NAME
 
 from nti.app.products.acclaim import MessageFactory as _
 
@@ -36,6 +35,7 @@ from nti.app.products.acclaim.authorization import ACT_ACCLAIM
 from nti.app.products.acclaim.interfaces import IAcclaimClient
 from nti.app.products.acclaim.interfaces import AcclaimClientError
 from nti.app.products.acclaim.interfaces import IAcclaimIntegration
+from nti.app.products.acclaim.interfaces import IAcclaimInitializationUtility
 from nti.app.products.acclaim.interfaces import InvalidAcclaimIntegrationError
 
 from nti.appserver.dataserver_pyramid_views import GenericGetView
@@ -49,8 +49,6 @@ from nti.dataserver.interfaces import IHostPolicyFolder
 
 from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import StandardExternalFields
-
-from nti.site.localutility import install_utility
 
 from nti.site.utils import unregisterUtility
 
@@ -78,43 +76,23 @@ class AcclaimIntegrationUpdateMixin(object):
     def site_manager(self):
         return self.site.getSiteManager()
 
-    def _register_integration(self, obj):
-        obj.__name__ = ACCLAIM_INTEGRATION_NAME
-        install_utility(obj,
-                        utility_name=obj.__name__,
-                        provided=IAcclaimIntegration,
-                        local_site_manager=self.site_manager)
-        return obj
-
     def _unregister_integration(self):
         registry = component.getSiteManager()
         unregisterUtility(registry, provided=IAcclaimIntegration)
 
-    def _get_organizations(self, integration):
-        client = IAcclaimClient(integration)
-        return client.get_organizations()
-
     def set_organization(self, integration):
         """
-        Fetch organizations, which should be a single entry.
+        Fetch organizations, which should be a single entry. This should be
+        called every time the authorization token is updated.
 
         Raises :class:`InvalidAcclaimIntegrationError` if token is invalid.
         """
+        intialization_utility = component.getUtility(IAcclaimInitializationUtility)
         try:
-            organizations = self._get_organizations(integration)
+            intialization_utility.initialize(integration)
         except InvalidAcclaimIntegrationError:
             raise_error({'message': _(u"Invalid Acclaim authorization_token."),
                          'code': 'InvalidAcclaimAuthorizationTokenError'})
-        organizations = organizations.organizations
-        if len(organizations) == 1:
-            # Just one organization - set and use
-            integration.organization = organizations[0]
-            integration.organization.__parent__ = integration
-            self._register_integration(integration)
-        else:
-            logger.warn("Multiple organizations tied to auth token (%s) (%s)",
-                        integration.authorization_token,
-                        organizations)
         return integration
 
 
@@ -152,10 +130,7 @@ class EnableAcclaimIntegrationView(AbstractAuthenticatedView,
             raise_error({'message': _(u"Acclaim integration already exist"),
                          'code': 'ExistingAcclaimIntegrationError'})
         integration = self.readCreateUpdateContentObject(self.remoteUser)
-        if integration.organization:
-            result = self._register_integration(integration)
-        else:
-            result = self.set_organization(integration)
+        result = self.set_organization(integration)
         return result
 
 

@@ -39,7 +39,7 @@ class TestIntegration(ApplicationLayerTest):
         role_manager.assignRoleToPrincipal(role_name, username)
 
     @WithSharedApplicationMockDS(users=True, testapp=True)
-    @fudge.patch('nti.app.products.acclaim.views.AcclaimIntegrationUpdateMixin._get_organizations')
+    @fudge.patch('nti.app.products.acclaim.client._AcclaimInitializationUtility._get_organizations')
     def test_integration(self, mock_get_orgs):
         """
         Test enabling acclaim integration and editing.

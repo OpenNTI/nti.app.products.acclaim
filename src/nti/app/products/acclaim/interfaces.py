@@ -31,6 +31,15 @@ from nti.schema.field import ValidDatetime
 from nti.schema.field import DecodingValidTextLine as ValidTextLine
 
 
+class IAcclaimInitializationUtility(interface.Interface):
+
+    def initialize(self, integration):
+        """
+        Handles initializing the :class:`IAcclaimIntegration`, which involves finding
+        the base_url and picking an organization.
+        """
+
+
 class IAcclaimEvidence(interface.Interface):
     """
     An Acclaim badge evidence.
@@ -92,6 +101,9 @@ class IAcclaimIntegration(IIntegration, ICreated, ILastModified, IShouldHaveTrav
                                         min_length=1,
                                         required=True)
 
+    base_url = HTTPURL(title=u"Base API url",
+                       required=False)
+
     organization = Object(IAcclaimOrganization,
                           title=u'The Acclaim organization tied to this integration.',
                           required=False)
@@ -99,7 +111,7 @@ class IAcclaimIntegration(IIntegration, ICreated, ILastModified, IShouldHaveTrav
 
 class IAcclaimClient(interface.Interface):
     """
-    An Acclaim client to fetch webinar information. The client is tied to a
+    An Acclaim client to fetch Acclaim information. The client is tied to a
     specific authorization_token. All badge calls must have an organization id.
     """
 

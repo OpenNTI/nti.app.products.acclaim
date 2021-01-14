@@ -43,6 +43,8 @@
     <!-- Integration -->
     <adapter factory=".client.integration_to_client" />
 
+    <utility factory=".client._AcclaimInitializationUtility" />
+
     <utility factory=".integration.AcclaimIntegrationProvider"
              name="acclaim" />
 
