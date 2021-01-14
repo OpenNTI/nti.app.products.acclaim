@@ -95,7 +95,10 @@ class TestIntegration(ApplicationLayerTest):
                                      'NTIID', not_none(),
                                      'authorization_token', '******************ion_token',
                                      'Creator', 'acclaim_site_admin',
-                                     'Last Modified', not_none()))
+                                     'Last Modified', not_none(),
+                                     'organization', has_entry('organization_id', 'test_org_id')))
+
+        disconnect_href = self.require_link_href_with_rel(res, 'disconnect')
 
         # Can not re-enable
         self.testapp.post_json(enable_href,
@@ -108,12 +111,21 @@ class TestIntegration(ApplicationLayerTest):
                               extra_environ=other_env,
                               status=403)
 
+        # Change orgs
+        org = AcclaimOrganization(organization_id='test_org_id2')
+        org_collection.organizations = [org]
+        # Edit and update toke also fetches new orgs
         res = self.testapp.put_json(acclaim_href,
                                     {'authorization_token': 'new_token'},
                                     extra_environ=site_admin_env)
         res = res.json_body
-        assert_that(res, has_entry('authorization_token', '******ken'))
+        assert_that(res, has_entries('authorization_token', '******ken',
+                                     'organization', has_entry('organization_id', 'test_org_id2')))
 
         self.testapp.get(acclaim_href, extra_environ=other_env, status=403)
         self.testapp.get(acclaim_href, extra_environ=admin_env)
         self.testapp.get(acclaim_href, extra_environ=site_admin_env)
+
+        self.testapp.delete(disconnect_href, extra_environ=other_env, status=403)
+        self.testapp.delete(disconnect_href, extra_environ=admin_env)
+        self.testapp.delete(disconnect_href, extra_environ=site_admin_env, status=404)

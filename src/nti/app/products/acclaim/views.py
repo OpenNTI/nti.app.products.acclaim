@@ -183,10 +183,11 @@ class AcclaimIntegrationPutView(UGDPutView,
 class AcclaimIntegrationDeleteView(AbstractAuthenticatedView,
                                    AcclaimIntegrationUpdateMixin):
     """
-    Allow deleting (unauthorizing) a :class:`IWebinarAuthorizedIntegration`.
+    Allow deleting (unauthorizing) a :class:`IAcclaimIntegration`.
     """
 
     def __call__(self):
+        del self.site_manager[self.context.__name__]
         self._unregister_integration()
         return hexc.HTTPNoContent()
 
@@ -206,7 +207,7 @@ class AcclaimIntegrationOrganizationsView(AbstractAuthenticatedView):
             organizations = client.get_organizations()
         except AcclaimClientError:
                 raise_error({'message': _(u"Error during integration."),
-                             'code': 'WebinarClientError'})
+                             'code': 'AcclaimClientError'})
         result[ITEMS] = items = organizations
         result[ITEM_COUNT] = result[TOTAL] = len(items)
         return result
@@ -241,7 +242,7 @@ class AcclaimBadgesView(AbstractAuthenticatedView,
             collection = client.get_badges(sort=None, filters=None, page=None)
         except AcclaimClientError:
                 raise_error({'message': _(u"Error while getting badge templates."),
-                             'code': 'WebinarClientError'})
+                             'code': 'AcclaimClientError'})
         return collection
 
 
@@ -272,5 +273,5 @@ class UserAwardedBadgesView(AbstractAuthenticatedView,
                                                public_only=public_only)
         except AcclaimClientError:
                 raise_error({'message': _(u"Error while getting issued badges."),
-                             'code': 'WebinarClientError'})
+                             'code': 'AcclaimClientError'})
         return collection
