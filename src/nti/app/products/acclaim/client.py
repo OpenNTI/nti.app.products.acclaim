@@ -29,6 +29,7 @@ from nti.app.products.acclaim.interfaces import IAcclaimIntegration
 from nti.app.products.acclaim.interfaces import IAwardedAcclaimBadge
 from nti.app.products.acclaim.interfaces import IAcclaimOrganization
 from nti.app.products.acclaim.interfaces import IAcclaimBadgeCollection
+from nti.app.products.acclaim.interfaces import InvalidAcclaimIntegrationError
 from nti.app.products.acclaim.interfaces import IAwardedAcclaimBadgeCollection
 from nti.app.products.acclaim.interfaces import IAcclaimOrganizationCollection
 from nti.app.products.acclaim.interfaces import MissingAcclaimOrganizationError
@@ -97,6 +98,8 @@ class AcclaimClient(object):
                         url,
                         response.status_code,
                         response.text)
+            if response.status_code == 401:
+                raise InvalidAcclaimIntegrationError(response.text)
             raise AcclaimClientError(response.text)
         return response
 

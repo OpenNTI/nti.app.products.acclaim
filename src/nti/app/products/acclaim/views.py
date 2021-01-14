@@ -25,6 +25,7 @@ from nti.app.externalization.error import raise_json_error
 from nti.app.externalization.view_mixins import BatchingUtilsMixin
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
+from nti.app.products.acclaim import BADGES
 from nti.app.products.acclaim import ENABLE_ACCLAIM_VIEW
 from nti.app.products.acclaim import ACCLAIM_INTEGRATION_NAME
 
@@ -33,12 +34,17 @@ from nti.app.products.acclaim import MessageFactory as _
 from nti.app.products.acclaim.authorization import ACT_ACCLAIM
 
 from nti.app.products.acclaim.interfaces import IAcclaimClient
+from nti.app.products.acclaim.interfaces import AcclaimClientError
 from nti.app.products.acclaim.interfaces import IAcclaimIntegration
+from nti.app.products.acclaim.interfaces import InvalidAcclaimIntegrationError
 
 from nti.appserver.dataserver_pyramid_views import GenericGetView
 
 from nti.appserver.ugd_edit_views import UGDPutView
 
+from nti.dataserver.authorization import ACT_READ
+
+from nti.dataserver.interfaces import IUser
 from nti.dataserver.interfaces import IHostPolicyFolder
 
 from nti.externalization.interfaces import LocatedExternalDict
@@ -89,7 +95,16 @@ class AcclaimIntegrationUpdateMixin(object):
         return client.get_organizations()
 
     def set_organization(self, integration):
-        organizations = self._get_organizations(integration)
+        """
+        Fetch organizations, which should be a single entry.
+
+        Raises :class:`InvalidAcclaimIntegrationError` if token is invalid.
+        """
+        try:
+            organizations = self._get_organizations(integration)
+        except InvalidAcclaimIntegrationError:
+            raise_error({'message': _(u"Invalid Acclaim authorization_token."),
+                         'code': 'InvalidAcclaimAuthorizationTokenError'})
         organizations = organizations.organizations
         if len(organizations) == 1:
             # Just one organization - set and use
@@ -187,7 +202,11 @@ class AcclaimIntegrationOrganizationsView(AbstractAuthenticatedView):
     def __call__(self):
         result = LocatedExternalDict()
         client = IAcclaimClient(self.context)
-        organizations = client.get_organizations()
+        try:
+            organizations = client.get_organizations()
+        except AcclaimClientError:
+                raise_error({'message': _(u"Error during integration."),
+                             'code': 'WebinarClientError'})
         result[ITEMS] = items = organizations
         result[ITEM_COUNT] = result[TOTAL] = len(items)
         return result
@@ -205,7 +224,7 @@ class AcclaimIntegrationGetView(GenericGetView):
 @view_config(route_name='objects.generic.traversal',
              context=IAcclaimIntegration,
              request_method='GET',
-             name='badges',
+             name=BADGES,
              permission=ACT_ACCLAIM,
              renderer='rest')
 class AcclaimBadgesView(AbstractAuthenticatedView,
@@ -218,5 +237,40 @@ class AcclaimBadgesView(AbstractAuthenticatedView,
 
     def __call__(self):
         client = IAcclaimClient(self.context)
-        collection = client.get_badges(sort=None, filters=None, page=None)
+        try:
+            collection = client.get_badges(sort=None, filters=None, page=None)
+        except AcclaimClientError:
+                raise_error({'message': _(u"Error while getting badge templates."),
+                             'code': 'WebinarClientError'})
+        return collection
+
+
+@view_config(route_name='objects.generic.traversal',
+             context=IUser,
+             request_method='GET',
+             name=BADGES,
+             permission=ACT_READ,
+             renderer='rest')
+class UserAwardedBadgesView(AbstractAuthenticatedView,
+                            BatchingUtilsMixin):
+    """
+    Get all awarded badges for this user.
+
+    Other parties will only be able to see public badges.
+
+    TODO: Sorting, paging, filtering?
+    """
+
+    def __call__(self):
+        public_only = self.remoteUser != self.context
+        client = IAcclaimClient(self.context)
+        try:
+            collection = client.get_awarded_badges(self.context,
+                                               sort=None,
+                                               filters=None,
+                                               page=None,
+                                               public_only=public_only)
+        except AcclaimClientError:
+                raise_error({'message': _(u"Error while getting issued badges."),
+                             'code': 'WebinarClientError'})
         return collection
