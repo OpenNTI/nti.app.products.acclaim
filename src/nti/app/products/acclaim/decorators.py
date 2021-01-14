@@ -54,10 +54,23 @@ class _AcclaimEnableIntegrationDecorator(AbstractAuthenticatedRequestAwareDecora
     def _predicate(self, context, unused_result):
         current_site = getSite()
         return super(_AcclaimEnableIntegrationDecorator, self)._predicate(context, unused_result) \
-           and has_permission(ACT_ACCLAIM, current_site, self.request) \
+           and has_permission(ACT_ACCLAIM, current_site, self.request)
+
+    def _obscure_authorization_token(self, token):
+        """
+        Return first 3/4 of token as astericks.
+        """
+        token_len = len(token)
+        segment_len = int(token_len) / 4
+        prefix_len = segment_len * 3
+        prefix = '*' * prefix_len
+        suffix = token[prefix_len:]
+        return '%s%s' % (prefix, suffix)
 
     def _do_decorate_external(self, context, result):
         links = result.setdefault(LINKS, [])
+        if context.authorization_token:
+            result['authorization_token'] = self._obscure_authorization_token(context.authorization_token)
         if not context.authorization_token:
             link_context = getSite()
             link = Link(link_context,

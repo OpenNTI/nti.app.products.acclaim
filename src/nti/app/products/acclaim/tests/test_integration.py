@@ -82,7 +82,7 @@ class TestIntegration(ApplicationLayerTest):
         assert_that(acclaim_href, not_none())
         assert_that(res, has_entries('CreatedTime', not_none(),
                                      'NTIID', not_none(),
-                                     'authorization_token', 'acclaim_authorization_token',
+                                     'authorization_token', '*******************on_token',
                                      'Creator', 'acclaim_site_admin',
                                      'Last Modified', not_none()))
 
@@ -101,7 +101,7 @@ class TestIntegration(ApplicationLayerTest):
                                     {'authorization_token': 'new_token'},
                                     extra_environ=site_admin_env)
         res = res.json_body
-        assert_that(res, has_entry('authorization_token', 'new_token'))
+        assert_that(res, has_entry('authorization_token', '*******en'))
 
         self.testapp.get(acclaim_href, extra_environ=other_env, status=403)
         self.testapp.get(acclaim_href, extra_environ=admin_env)

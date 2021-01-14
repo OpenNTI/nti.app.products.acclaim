@@ -55,7 +55,7 @@ class AcclaimClient(object):
     The client to interact with acclaim.
     """
 
-    # FIXME
+    # FIXME register util for this
     BASE_URL = 'https://sandbox.youracclaim.com/v1'
 
     ORGANIZATIONS_URL = '/organizations'
