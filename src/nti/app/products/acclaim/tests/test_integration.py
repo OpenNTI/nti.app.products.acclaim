@@ -10,9 +10,14 @@ from hamcrest import has_entry
 from hamcrest import assert_that
 from hamcrest import has_entries
 
+import fudge
+
 from zope.component.hooks import getSite
 
 from zope.securitypolicy.interfaces import IPrincipalRoleManager
+
+from nti.app.products.acclaim.client_models import AcclaimOrganization
+from nti.app.products.acclaim.client_models import AcclaimOrganizationCollection
 
 from nti.app.testing.application_webtest import ApplicationLayerTest
 
@@ -34,10 +39,16 @@ class TestIntegration(ApplicationLayerTest):
         role_manager.assignRoleToPrincipal(role_name, username)
 
     @WithSharedApplicationMockDS(users=True, testapp=True)
-    def test_integration(self):
+    @fudge.patch('nti.app.products.acclaim.views.AcclaimIntegrationUpdateMixin._get_organizations')
+    def test_integration(self, mock_get_orgs):
         """
         Test enabling acclaim integration and editing.
         """
+        org_collection = AcclaimOrganizationCollection()
+        org = AcclaimOrganization(organization_id='test_org_id')
+        org_collection.organizations = [org]
+
+        mock_get_orgs.is_callable().returns(org_collection)
         admin_username = 'acclaim_int@nextthought.com'
         site_admin_username = 'acclaim_site_admin'
         other_username = 'acclaim_int_other'
@@ -82,7 +93,7 @@ class TestIntegration(ApplicationLayerTest):
         assert_that(acclaim_href, not_none())
         assert_that(res, has_entries('CreatedTime', not_none(),
                                      'NTIID', not_none(),
-                                     'authorization_token', '*******************on_token',
+                                     'authorization_token', '******************ion_token',
                                      'Creator', 'acclaim_site_admin',
                                      'Last Modified', not_none()))
 
@@ -101,7 +112,7 @@ class TestIntegration(ApplicationLayerTest):
                                     {'authorization_token': 'new_token'},
                                     extra_environ=site_admin_env)
         res = res.json_body
-        assert_that(res, has_entry('authorization_token', '*******en'))
+        assert_that(res, has_entry('authorization_token', '******ken'))
 
         self.testapp.get(acclaim_href, extra_environ=other_env, status=403)
         self.testapp.get(acclaim_href, extra_environ=admin_env)

@@ -61,7 +61,7 @@ class _AcclaimEnableIntegrationDecorator(AbstractAuthenticatedRequestAwareDecora
         Return first 3/4 of token as astericks.
         """
         token_len = len(token)
-        segment_len = int(token_len) / 4
+        segment_len = int(token_len / 4)
         prefix_len = segment_len * 3
         prefix = '*' * prefix_len
         suffix = token[prefix_len:]
