@@ -52,6 +52,11 @@
                 for=".interfaces.IAcclaimIntegration
                      pyramid.interfaces.IRequest" />
 
+    <subscriber factory=".decorators._UserBadgesLinkDecorator"
+                provides="nti.externalization.interfaces.IExternalMappingDecorator"
+                for="nti.dataserver.interfaces.IUser
+                     pyramid.interfaces.IRequest" />
+
     <!-- Internalization -->
     <adapter factory=".client_models._acclaim_id_evidence_factory"
              for="dict"

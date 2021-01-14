@@ -121,7 +121,6 @@ class AcclaimClient(object):
             raise MissingAcclaimOrganizationError()
         params = dict()
         filters = dict(filters) if filters else dict()
-        filters['public'] = True
         filters['state'] = 'active'
         if sort:
             params['sort'] = sort
@@ -166,7 +165,7 @@ class AcclaimClient(object):
             result += '%s::%s' % (key, val)
         return result
 
-    def get_awarded_badges(self, user, sort=None, filters=None, page=None):
+    def get_awarded_badges(self, user, sort=None, filters=None, page=None, public_only=None):
         """
         Return an :class:`IAwardedAcclaimBadgeCollection`.
 
@@ -179,7 +178,8 @@ class AcclaimClient(object):
         # We want *all* badges tied to this user (by email) in Acclaim. The
         # user may have multiple email addresses on their Acclaim account.
         filters['recipient_email_all'] = self._get_user_email(user)
-        filters['public'] = True
+        if public_only:
+            filters['public'] = True
         # We only want pending or accepted badges (not revoked or rejected)
         filters['state'] = 'pending,accepted'
         if sort:
