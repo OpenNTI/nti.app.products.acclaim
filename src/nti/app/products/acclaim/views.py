@@ -239,13 +239,16 @@ class UserAwardedBadgesView(AbstractAuthenticatedView,
 
     def __call__(self):
         public_only = self.remoteUser != self.context
-        client = IAcclaimClient(self.context)
+        integration = component.queryUtility(IAcclaimIntegration)
+        if not integration:
+            raise hexc.HTTPNotFound()
+        client = IAcclaimClient(integration)
         try:
             collection = client.get_awarded_badges(self.context,
-                                               sort=None,
-                                               filters=None,
-                                               page=None,
-                                               public_only=public_only)
+                                                   sort=None,
+                                                   filters=None,
+                                                   page=None,
+                                                   public_only=public_only)
         except AcclaimClientError:
                 raise_error({'message': _(u"Error while getting issued badges."),
                              'code': 'AcclaimClientError'})
