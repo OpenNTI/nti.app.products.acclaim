@@ -163,11 +163,8 @@ class AcclaimBadge(PersistentCreatedAndModifiedTimeObject,
 
     mimeType = mime_type = "application/vnd.nextthought.acclaim.badge"
 
+    __name__ = None
     __parent__ = None
-
-    @property
-    def __name__(self):
-        return str(self.template_id)
 
     @property
     def ntiid(self):
