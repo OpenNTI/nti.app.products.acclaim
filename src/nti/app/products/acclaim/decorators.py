@@ -73,8 +73,7 @@ class _AcclaimIntegrationDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
     def _predicate(self, context, result):
         return super(_AcclaimIntegrationDecorator, self)._predicate(context, result) \
-           and has_permission(ACT_ACCLAIM, context, self.request) \
-           and context.authorization_token
+           and has_permission(ACT_ACCLAIM, context, self.request)
 
     def _obscure_authorization_token(self, token):
         """
@@ -88,7 +87,8 @@ class _AcclaimIntegrationDecorator(AbstractAuthenticatedRequestAwareDecorator):
         return '%s%s' % (prefix, suffix)
 
     def _do_decorate_external(self, context, result):
-        result['authorization_token'] = self._obscure_authorization_token(context.authorization_token)
+        if context.authorization_token:
+            result['authorization_token'] = self._obscure_authorization_token(context.authorization_token)
         links = result.setdefault(LINKS, [])
         link = Link(context,
                     rel='disconnect',
