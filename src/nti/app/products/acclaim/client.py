@@ -196,7 +196,7 @@ class AcclaimClient(object):
         if sort:
             params['sort'] = sort
         if filters:
-            params['filters'] = self._get_filter_str(filters)
+            params['filter'] = self._get_filter_str(filters)
         if page:
             params['page'] = page
         url = self.ORGANIZATION_ALL_BADGES_URL % self.organization_id
@@ -231,10 +231,10 @@ class AcclaimClient(object):
         return result
 
     def _get_filter_str(self, filter_dict):
-        result = ''
+        result = []
         for key, val in filter_dict.items():
-            result += '%s::%s' % (key, val)
-        return result
+            result.append('%s::%s' % (key, val))
+        return '|'.join(result)
 
     def get_awarded_badges(self, user, sort=None, filters=None, page=None, public_only=None):
         """
@@ -256,7 +256,7 @@ class AcclaimClient(object):
         if sort:
             params['sort'] = sort
         if filters:
-            params['filters'] = self._get_filter_str(filters)
+            params['filter'] = self._get_filter_str(filters)
         if page is not None:
             params['page'] = page
         url = self.BADGE_URL % self.organization_id

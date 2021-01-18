@@ -32,7 +32,8 @@ from nti.app.products.acclaim import MessageFactory as _
 
 from nti.app.products.acclaim.authorization import ACT_ACCLAIM
 
-from nti.app.products.acclaim.interfaces import IAcclaimClient, IAcclaimBadge
+from nti.app.products.acclaim.interfaces import IAcclaimBadge
+from nti.app.products.acclaim.interfaces import IAcclaimClient
 from nti.app.products.acclaim.interfaces import AcclaimClientError
 from nti.app.products.acclaim.interfaces import IAcclaimIntegration
 from nti.app.products.acclaim.interfaces import IAcclaimInitializationUtility
@@ -40,7 +41,8 @@ from nti.app.products.acclaim.interfaces import InvalidAcclaimIntegrationError
 
 from nti.appserver.dataserver_pyramid_views import GenericGetView
 
-from nti.appserver.ugd_edit_views import UGDPutView, UGDDeleteView
+from nti.appserver.ugd_edit_views import UGDPutView
+from nti.appserver.ugd_edit_views import UGDDeleteView
 
 from nti.dataserver.authorization import ACT_READ
 
