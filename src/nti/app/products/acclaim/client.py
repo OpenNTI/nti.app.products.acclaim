@@ -63,11 +63,11 @@ class _AcclaimInitializationUtility(object):
     BASE_URLS = ('https://api.youracclaim.com/v1',
                  'https://sandbox.youracclaim.com/v1')
 
-    @Lazy
+    @property
     def site(self):
         return getSite()
 
-    @Lazy
+    @property
     def site_manager(self):
         return self.site.getSiteManager()
 
