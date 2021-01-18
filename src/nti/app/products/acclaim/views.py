@@ -164,7 +164,10 @@ class AcclaimIntegrationDeleteView(AbstractAuthenticatedView,
     """
 
     def __call__(self):
-        del self.site_manager[self.context.__name__]
+        try:
+            del self.site_manager[self.context.__name__]
+        except KeyError:
+            pass
         self._unregister_integration()
         return hexc.HTTPNoContent()
 

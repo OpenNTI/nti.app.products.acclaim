@@ -70,6 +70,11 @@ class _AcclaimInitializationUtility(object):
         return self.site.getSiteManager()
 
     def _register_integration(self, obj):
+        # XXX: Clean up old at this point
+        try:
+            del self.site_manager[ACCLAIM_INTEGRATION_NAME]
+        except KeyError:
+            pass
         obj.__name__ = ACCLAIM_INTEGRATION_NAME
         install_utility(obj,
                         utility_name=obj.__name__,
