@@ -32,7 +32,7 @@ from nti.app.products.acclaim import MessageFactory as _
 
 from nti.app.products.acclaim.authorization import ACT_ACCLAIM
 
-from nti.app.products.acclaim.interfaces import IAcclaimClient
+from nti.app.products.acclaim.interfaces import IAcclaimClient, IAcclaimBadge
 from nti.app.products.acclaim.interfaces import AcclaimClientError
 from nti.app.products.acclaim.interfaces import IAcclaimIntegration
 from nti.app.products.acclaim.interfaces import IAcclaimInitializationUtility
@@ -40,7 +40,7 @@ from nti.app.products.acclaim.interfaces import InvalidAcclaimIntegrationError
 
 from nti.appserver.dataserver_pyramid_views import GenericGetView
 
-from nti.appserver.ugd_edit_views import UGDPutView
+from nti.appserver.ugd_edit_views import UGDPutView, UGDDeleteView
 
 from nti.dataserver.authorization import ACT_READ
 
@@ -195,6 +195,24 @@ class AcclaimIntegrationOrganizationsView(AbstractAuthenticatedView):
              renderer='rest')
 class AcclaimIntegrationGetView(GenericGetView):
     pass
+
+
+@view_config(route_name='objects.generic.traversal',
+             context=IAcclaimBadge,
+             request_method='DELETE',
+             permission=ACT_ACCLAIM,
+             renderer='rest')
+class AcclaimBadgeDeleteView(UGDDeleteView):
+    """
+    Allow deleting a :class:`IAcclaimBadge`.
+    """
+
+    def __call__(self):
+        try:
+            del self.context.__parent__[self.context.__name__]
+        except KeyError:
+            pass
+        return hexc.HTTPNoContent()
 
 
 @view_config(route_name='objects.generic.traversal',
