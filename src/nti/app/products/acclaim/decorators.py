@@ -90,12 +90,13 @@ class _AcclaimIntegrationDecorator(AbstractAuthenticatedRequestAwareDecorator):
         result['authorization_token'] = self._obscure_authorization_token(context.authorization_token)
         links = result.setdefault(LINKS, [])
         link = Link(context,
-                        rel='disconnect',
-                        method='DELETE')
+                    rel='disconnect',
+                    method='DELETE')
         links.append(located_link(context, link))
 
         link = Link(context,
-                    rel='badges')
+                    rel='badges',
+                    elements=(BADGES,))
         links.append(located_link(context, link))
 
 

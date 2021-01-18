@@ -18,8 +18,6 @@ from datetime import datetime
 from zope import component
 from zope import interface
 
-from zope.cachedescriptors.property import Lazy
-
 from zope.component.hooks import getSite
 
 from zope.intid.interfaces import IIntIds
@@ -147,6 +145,8 @@ class AcclaimClient(object):
         if not acceptable_return_codes:
             acceptable_return_codes = (200,)
         url = '%s%s' % (self.base_url, url)
+        logger.debug('acclaim badges call (url=%s) (params=%s) (post_data=%s)',
+                     url, params, post_data)
 
         access_header = 'Basic %s' % self.b64_token
         if post_data:
