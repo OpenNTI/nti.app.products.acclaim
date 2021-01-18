@@ -70,8 +70,8 @@ class _AcclaimEnableIntegrationDecorator(AbstractAuthenticatedRequestAwareDecora
 @interface.implementer(IExternalMappingDecorator)
 class _AcclaimIntegrationDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
-    def _predicate(self, context, unused_result):
-        return super(_AcclaimEnableIntegrationDecorator, self)._predicate(context, unused_result) \
+    def _predicate(self, context, result):
+        return super(_AcclaimIntegrationDecorator, self)._predicate(context, result) \
            and has_permission(ACT_ACCLAIM, context, self.request) \
            and context.authorization_token
 
