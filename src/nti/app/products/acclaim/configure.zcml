@@ -54,6 +54,11 @@
                 for=".interfaces.IAcclaimIntegration
                      pyramid.interfaces.IRequest" />
 
+    <subscriber factory=".decorators._AcclaimIntegrationDecorator"
+                provides="nti.externalization.interfaces.IExternalMappingDecorator"
+                for=".interfaces.IAcclaimIntegration
+                     pyramid.interfaces.IRequest" />
+
     <subscriber factory=".decorators._UserBadgesLinkDecorator"
                 provides="nti.externalization.interfaces.IExternalMappingDecorator"
                 for="nti.dataserver.interfaces.IUser
