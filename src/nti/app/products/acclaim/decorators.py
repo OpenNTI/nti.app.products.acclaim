@@ -18,6 +18,7 @@ from zope.container.interfaces import ILocation
 from nti.app.products.acclaim import BADGES
 from nti.app.products.acclaim import ENABLE_ACCLAIM_VIEW
 
+from nti.app.products.acclaim.interfaces import IAcclaimBadge
 from nti.app.products.acclaim.interfaces import IAcclaimIntegration
 
 from nti.app.renderers.decorators import AbstractAuthenticatedRequestAwareDecorator
@@ -115,3 +116,17 @@ class _UserBadgesLinkDecorator(AbstractAuthenticatedRequestAwareDecorator):
     def _do_decorate_external(self, context, mapping):
         _links = mapping.setdefault(LINKS, [])
         _links.append(Link(context, elements=(BADGES,), rel=BADGES))
+
+
+@component.adapter(IAcclaimBadge)
+@interface.implementer(IExternalMappingDecorator)
+class _BadgeDecorator(AbstractAuthenticatedRequestAwareDecorator):
+
+    def _predicate(self, unused_context, unused_result):
+        return component.queryUtility(IAcclaimIntegration) is not None
+
+    def _do_decorate_external(self, context, mapping):
+        integration = component.queryUtility(IAcclaimIntegration)
+        current_organization_id = getattr(integration.organization, 'organization_id', None)
+        mapping['InvalidOrganization'] =   not current_organization_id \
+                                        or context.organization_id != current_organization_id

@@ -49,6 +49,11 @@
              name="acclaim" />
 
     <!-- Decorators -->
+    <subscriber factory=".decorators._BadgeDecorator"
+                provides="nti.externalization.interfaces.IExternalMappingDecorator"
+                for=".interfaces.IAcclaimBadge
+                     pyramid.interfaces.IRequest" />
+
     <subscriber factory=".decorators._AcclaimEnableIntegrationDecorator"
                 provides="nti.externalization.interfaces.IExternalMappingDecorator"
                 for=".interfaces.IAcclaimIntegration
