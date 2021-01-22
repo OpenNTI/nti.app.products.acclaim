@@ -6,6 +6,8 @@ MessageFactory = zope.i18nmessageid.MessageFactory(__name__)
 
 BADGES = 'badges'
 
+VIEW_AWARDED_BADGES = 'awarded_badges'
+
 ENABLE_ACCLAIM_VIEW = 'EnableAcclaim'
 
 ACCLAIM_INTEGRATION_NAME = u'acclaim'

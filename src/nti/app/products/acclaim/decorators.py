@@ -17,6 +17,7 @@ from zope.container.interfaces import ILocation
 
 from nti.app.products.acclaim import BADGES
 from nti.app.products.acclaim import ENABLE_ACCLAIM_VIEW
+from nti.app.products.acclaim import VIEW_AWARDED_BADGES
 
 from nti.app.products.acclaim.interfaces import IAcclaimBadge
 from nti.app.products.acclaim.interfaces import IAcclaimIntegration
@@ -115,7 +116,9 @@ class _UserBadgesLinkDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
     def _do_decorate_external(self, context, mapping):
         _links = mapping.setdefault(LINKS, [])
-        _links.append(Link(context, elements=(BADGES,), rel=BADGES))
+        _links.append(Link(context,
+                           elements=(VIEW_AWARDED_BADGES,),
+                           rel=VIEW_AWARDED_BADGES))
 
 
 @component.adapter(IAcclaimBadge)

@@ -27,6 +27,7 @@ from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtils
 
 from nti.app.products.acclaim import BADGES
 from nti.app.products.acclaim import ENABLE_ACCLAIM_VIEW
+from nti.app.products.acclaim import VIEW_AWARDED_BADGES
 
 from nti.app.products.acclaim import MessageFactory as _
 
@@ -247,7 +248,7 @@ class AcclaimBadgesView(AbstractAuthenticatedView,
 @view_config(route_name='objects.generic.traversal',
              context=IUser,
              request_method='GET',
-             name=BADGES,
+             name=VIEW_AWARDED_BADGES,
              permission=ACT_READ,
              renderer='rest')
 class UserAwardedBadgesView(AbstractAuthenticatedView,
