@@ -88,7 +88,7 @@ class TestAcclaimClientInternalization(unittest.TestCase):
         assert_that(collection.total_pages, is_(1))
 
         collection_ext = to_external_object(collection)
-        assert_that(collection_ext, has_entries('badges', has_length(2),
+        assert_that(collection_ext, has_entries('Items', has_length(2),
                                                 'badges_count', 2,
                                                 'total_badges_count', 2,
                                                 'current_page', 1,
@@ -124,12 +124,12 @@ class TestAcclaimClientInternalization(unittest.TestCase):
                                                               'type', 'IdEvidence'))
 
         collection_ext = to_external_object(collection)
-        assert_that(collection_ext, has_entries('badges', has_length(1),
+        assert_that(collection_ext, has_entries('Items', has_length(1),
                                                 'badges_count', 1,
                                                 'total_badges_count', 1,
                                                 'current_page', 1,
                                                 'total_pages', 1))
-        badge_ext = collection_ext['badges'][0]
+        badge_ext = collection_ext['Items'][0]
         assert_that(badge_ext, has_entries('recipient_email', u"user10001@example.com",
                                            'locale', u"en",
                                            'public', True,

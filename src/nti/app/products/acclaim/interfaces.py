@@ -262,18 +262,18 @@ class IBadgePageMetadata(interface.Interface):
 
 class IAcclaimBadgeCollection(IBadgePageMetadata):
 
-    badges = ListOrTuple(Object(IAcclaimBadge),
-                         title=u"Acclaim badges",
-                         required=True,
-                         min_length=0)
+    Items = ListOrTuple(Object(IAcclaimBadge),
+                        title=u"Acclaim badges",
+                        required=True,
+                        min_length=0)
 
 
 class IAwardedAcclaimBadgeCollection(IBadgePageMetadata):
 
-    badges = ListOrTuple(Object(IAwardedAcclaimBadge),
-                         title=u"Awarded Acclaim badges",
-                         required=True,
-                         min_length=0)
+    Items = ListOrTuple(Object(IAwardedAcclaimBadge),
+                        title=u"Awarded Acclaim badges",
+                        required=True,
+                        min_length=0)
 
 
 class IAcclaimOrganizationCollection(interface.Interface):

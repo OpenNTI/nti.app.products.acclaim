@@ -105,7 +105,7 @@ def _acclaim_badge_collection_factory(ext):
     obj = AcclaimBadgeCollection()
     metadata = ext['metadata']
     new_ext = dict()
-    new_ext['badges'] = [IAcclaimBadge(x) for x in ext['data']]
+    new_ext['Items'] = [IAcclaimBadge(x) for x in ext['data']]
     new_ext['badges_count'] = metadata.get('count')
     new_ext['total_badges_count'] = metadata.get('total_count')
     new_ext['current_page'] = metadata.get('current_page')
@@ -120,7 +120,7 @@ def _awarded_acclaim_badge_collection_factory(ext):
     obj = AwardedAcclaimBadgeCollection()
     metadata = ext['metadata']
     new_ext = dict()
-    new_ext['badges'] = [IAwardedAcclaimBadge(x) for x in ext['data']]
+    new_ext['Items'] = [IAwardedAcclaimBadge(x) for x in ext['data']]
     new_ext['badges_count'] = metadata.get('count')
     new_ext['total_badges_count'] = metadata.get('total_count')
     new_ext['current_page'] = metadata.get('current_page')
@@ -188,6 +188,8 @@ class AcclaimBadgeCollection(SchemaConfigured):
 
     mimeType = mime_type = "application/vnd.nextthought.acclaim.badgecollection"
 
+    badges = alias('Items')
+
 
 @interface.implementer(IAwardedAcclaimBadgeCollection)
 class AwardedAcclaimBadgeCollection(SchemaConfigured):
@@ -195,6 +197,8 @@ class AwardedAcclaimBadgeCollection(SchemaConfigured):
     createDirectFieldProperties(IAwardedAcclaimBadgeCollection)
 
     mimeType = mime_type = "application/vnd.nextthought.acclaim.awardedbadgecollection"
+
+    badges = alias('Items')
 
 
 @interface.implementer(IAcclaimOrganizationCollection)
