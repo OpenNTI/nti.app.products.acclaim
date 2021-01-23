@@ -12,6 +12,8 @@ from pyramid import httpexceptions as hexc
 
 from pyramid.view import view_config
 
+from requests.structures import CaseInsensitiveDict
+
 from zope import component
 
 from zope.cachedescriptors.property import Lazy
@@ -50,8 +52,12 @@ from nti.dataserver.authorization import ACT_READ
 from nti.dataserver.interfaces import IUser
 from nti.dataserver.interfaces import IHostPolicyFolder
 
+from nti.externalization.externalization import to_external_object
+
 from nti.externalization.interfaces import LocatedExternalDict
 from nti.externalization.interfaces import StandardExternalFields
+
+from nti.links.links import Link
 
 from nti.site.utils import unregisterUtility
 
@@ -59,6 +65,7 @@ logger = __import__('logging').getLogger(__name__)
 
 ITEMS = StandardExternalFields.ITEMS
 TOTAL = StandardExternalFields.TOTAL
+LINKS = StandardExternalFields.LINKS
 MIMETYPE = StandardExternalFields.MIMETYPE
 ITEM_COUNT = StandardExternalFields.ITEM_COUNT
 
@@ -221,6 +228,64 @@ class AcclaimBadgeDeleteView(UGDDeleteView):
         return hexc.HTTPNoContent()
 
 
+class AbstractAcclaimAPIView(object):
+    """
+    Supply batch-next, batch-prev rels if necessary.
+    """
+
+    DEFAULT_SORT_PARAM = None
+
+    NAME_FILTER_KEY = 'name'
+
+    @Lazy
+    def _params(self):
+        return CaseInsensitiveDict(self.request.params)
+
+    @property
+    def page(self):
+        return self._params.get('page')
+
+    @property
+    def filter(self):
+        # Only filter on name currently
+        filter_str = self._params.get('filter')
+        if filter_str:
+            return {self.NAME_FILTER_KEY: filter_str}
+
+    @property
+    def sort(self):
+        result = self._params.get('sort', self.DEFAULT_SORT_PARAM)
+        result = result.split(',')
+        return result
+
+    def _decorate_batch_rels(self, acclaim_collection, ext):
+        batch_params = self.request.GET.copy()
+        batch_params.pop('page', None)
+        links = ext.setdefault(LINKS, [])
+        if acclaim_collection.current_page > 1:
+            prev_batch_params = dict(batch_params)
+            prev_batch_params['page'] = acclaim_collection.current_page - 1
+            link = Link(self.request.path_url,
+                        rel='batch-prev',
+                        params=batch_params)
+            links.append(link)
+        if acclaim_collection.current_page < acclaim_collection.total_pages:
+            next_batch_params = dict(batch_params)
+            next_batch_params['page'] = acclaim_collection.current_page + 1
+            link = Link(self.request.path_url,
+                        rel='batch-next',
+                        params=next_batch_params)
+            links.append(link)
+        return ext
+
+    def __call__(self):
+        acclaim_collection = self._do_call()
+        result = to_external_object(acclaim_collection)
+        # Create `page` batch rels
+        result = self._decorate_batch_rels(acclaim_collection, result)
+        return result
+
+
 @view_config(route_name='objects.generic.traversal',
              context=IAcclaimIntegration,
              request_method='GET',
@@ -232,16 +297,20 @@ class AcclaimBadgesView(AbstractAuthenticatedView,
     """
     Get all badges from this acclaim account
 
-    TODO: Sorting, paging, filtering?
+    sort - {badges_count, created_at, name, updated_at}
     """
 
-    def __call__(self):
+    DEFAULT_SORT_PARAM = 'name'
+
+    def _do_call(self):
         client = IAcclaimClient(self.context)
         try:
-            collection = client.get_badges(sort=None, filters=None, page=None)
+            collection = client.get_badges(sort=self.sort,
+                                           filters=self.filter,
+                                           page=self.page)
         except AcclaimClientError:
-                raise_error({'message': _(u"Error while getting badge templates."),
-                             'code': 'AcclaimClientError'})
+            raise_error({'message': _(u"Error while getting badge templates."),
+                         'code': 'AcclaimClientError'})
         return collection
 
 
@@ -258,10 +327,15 @@ class UserAwardedBadgesView(AbstractAuthenticatedView,
 
     Other parties will only be able to see public badges.
 
-    TODO: Sorting, paging, filtering?
+    sort - {created_at, issued_at, state_updated_at, badge_templates[name]}
     """
 
-    def __call__(self):
+    # Issued at in desc order ('-' is descending)
+    DEFAULT_SORT_PARAM = '-issued_at'
+
+    NAME_FILTER_KEY = 'badge_templates[name]'
+
+    def _do_call(self):
         public_only = self.remoteUser != self.context
         integration = component.queryUtility(IAcclaimIntegration)
         if not integration:
@@ -269,11 +343,11 @@ class UserAwardedBadgesView(AbstractAuthenticatedView,
         client = IAcclaimClient(integration)
         try:
             collection = client.get_awarded_badges(self.context,
-                                                   sort=None,
-                                                   filters=None,
-                                                   page=None,
+                                                   sort=self.sort,
+                                                   filters=self.filters,
+                                                   page=self.page,
                                                    public_only=public_only)
         except AcclaimClientError:
-                raise_error({'message': _(u"Error while getting issued badges."),
-                             'code': 'AcclaimClientError'})
+            raise_error({'message': _(u"Error while getting issued badges."),
+                         'code': 'AcclaimClientError'})
         return collection

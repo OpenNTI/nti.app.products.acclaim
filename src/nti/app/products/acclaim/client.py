@@ -199,7 +199,7 @@ class AcclaimClient(object):
         filters = dict(filters) if filters else dict()
         filters['state'] = 'active'
         if sort:
-            params['sort'] = sort
+            params['sort'] = self._get_sort_str(sort)
         if filters:
             params['filter'] = self._get_filter_str(filters)
         if page:
@@ -241,6 +241,9 @@ class AcclaimClient(object):
             result.append('%s::%s' % (key, val))
         return '|'.join(result)
 
+    def _get_sort_str(self, sort_seq):
+        return '|'.join(sort_seq)
+
     def get_awarded_badges(self, user, sort=None, filters=None, page=None, public_only=None):
         """
         Return an :class:`IAwardedAcclaimBadgeCollection`.
@@ -259,7 +262,7 @@ class AcclaimClient(object):
         # We only want pending or accepted badges (not revoked or rejected)
         filters['state'] = 'pending,accepted'
         if sort:
-            params['sort'] = sort
+            params['sort'] = self._get_sort_str(sort)
         if filters:
             params['filter'] = self._get_filter_str(filters)
         if page is not None:
