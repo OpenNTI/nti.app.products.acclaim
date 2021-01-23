@@ -20,6 +20,7 @@ from nti.app.products.acclaim import ENABLE_ACCLAIM_VIEW
 from nti.app.products.acclaim import VIEW_AWARDED_BADGES
 
 from nti.app.products.acclaim.interfaces import IAcclaimBadge
+from nti.app.products.acclaim.interfaces import IBadgePageMetadata
 from nti.app.products.acclaim.interfaces import IAcclaimIntegration
 
 from nti.app.renderers.decorators import AbstractAuthenticatedRequestAwareDecorator
@@ -36,8 +37,11 @@ from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator
 
 from nti.links.links import Link
+from nti.externalization.singleton import Singleton
 
 LINKS = StandardExternalFields.LINKS
+TOTAL = StandardExternalFields.TOTAL
+ITEM_COUNT = StandardExternalFields.ITEM_COUNT
 
 logger = __import__('logging').getLogger(__name__)
 
@@ -133,3 +137,15 @@ class _BadgeDecorator(AbstractAuthenticatedRequestAwareDecorator):
         current_organization_id = getattr(integration.organization, 'organization_id', None)
         mapping['InvalidOrganization'] =   not current_organization_id \
                                         or context.organization_id != current_organization_id
+
+
+@component.adapter(IBadgePageMetadata)
+@interface.implementer(IExternalMappingDecorator)
+class _BadgePageDecorator(Singleton):
+    """
+    BadgePageDecorator to map items.
+    """
+
+    def decorateExternalMapping(self, context, mapping):
+        mapping[ITEM_COUNT] = context.badges_count
+        mapping[TOTAL] = context.total_badges_count
