@@ -228,7 +228,7 @@ class AcclaimBadgeDeleteView(UGDDeleteView):
         return hexc.HTTPNoContent()
 
 
-class AbstractAcclaimAPIView(object):
+class AbstractAcclaimAPIView(AbstractAuthenticatedView):
     """
     Supply batch-next, batch-prev rels if necessary.
     """
@@ -292,8 +292,7 @@ class AbstractAcclaimAPIView(object):
              name=BADGES,
              permission=ACT_ACCLAIM,
              renderer='rest')
-class AcclaimBadgesView(AbstractAuthenticatedView,
-                        BatchingUtilsMixin):
+class AcclaimBadgesView(AbstractAcclaimAPIView):
     """
     Get all badges from this acclaim account
 
@@ -320,8 +319,7 @@ class AcclaimBadgesView(AbstractAuthenticatedView,
              name=VIEW_AWARDED_BADGES,
              permission=ACT_READ,
              renderer='rest')
-class UserAwardedBadgesView(AbstractAuthenticatedView,
-                            BatchingUtilsMixin):
+class UserAwardedBadgesView(AbstractAcclaimAPIView):
     """
     Get all awarded badges for this user.
 
