@@ -342,7 +342,7 @@ class UserAwardedBadgesView(AbstractAcclaimAPIView):
         try:
             collection = client.get_awarded_badges(self.context,
                                                    sort=self.sort,
-                                                   filters=self.filters,
+                                                   filters=self.filter,
                                                    page=self.page,
                                                    public_only=public_only)
         except AcclaimClientError:
