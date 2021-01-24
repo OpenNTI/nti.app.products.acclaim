@@ -265,14 +265,14 @@ class AbstractAcclaimAPIView(AbstractAuthenticatedView):
         if acclaim_collection.current_page > 1:
             prev_batch_params = dict(batch_params)
             prev_batch_params['page'] = acclaim_collection.current_page - 1
-            link = Link(self.request.path_url,
+            link = Link(self.request.path,
                         rel='batch-prev',
-                        params=batch_params)
+                        params=prev_batch_params)
             links.append(link)
         if acclaim_collection.current_page < acclaim_collection.total_pages:
             next_batch_params = dict(batch_params)
             next_batch_params['page'] = acclaim_collection.current_page + 1
-            link = Link(self.request.path_url,
+            link = Link(self.request.path,
                         rel='batch-next',
                         params=next_batch_params)
             links.append(link)
