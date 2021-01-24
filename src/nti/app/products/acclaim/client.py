@@ -8,6 +8,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+import pytz
 import requests
 import nameparser
 
@@ -247,6 +248,8 @@ class AcclaimClient(object):
     def _get_formatted_date(self, date_obj=None):
         if not date_obj:
             date_obj = datetime.utcnow()
+        if not date_obj.tzinfo:
+            date_obj = date_obj.replace(tzinfo=pytz.UTC)
         return date_obj.strftime("%Y-%m-%d %H:%M:%S %z")
 
     def get_awarded_badges(self, user, sort=None, filters=None, page=None, public_only=None):
