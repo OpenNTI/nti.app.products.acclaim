@@ -244,6 +244,11 @@ class AcclaimClient(object):
     def _get_sort_str(self, sort_seq):
         return '|'.join(sort_seq)
 
+    def _get_formatted_date(self, date_obj=None):
+        if not date_obj:
+            date_obj = datetime.utcnow()
+        return date_obj.strftime("%Y-%m-%d %H:%M:%S %z")
+
     def get_awarded_badges(self, user, sort=None, filters=None, page=None, public_only=None):
         """
         Return an :class:`IAwardedAcclaimBadgeCollection`.
@@ -293,7 +298,7 @@ class AcclaimClient(object):
             data['issued_to_last_name'] = human_name.last
         data['badge_template_id'] = badge_template_id
         data['issuer_earner_id'] = self._get_user_id(user)
-        data['issued_at'] = datetime.utcnow().isoformat()
+        data['issued_at'] = self._get_formatted_date()
         data['suppress_badge_notification_email'] = suppress_badge_notification_email
         if locale:
             data['locale'] = locale
