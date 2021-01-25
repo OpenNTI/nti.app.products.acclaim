@@ -38,6 +38,7 @@ from nti.app.products.acclaim.interfaces import InvalidAcclaimIntegrationError
 from nti.app.products.acclaim.interfaces import IAwardedAcclaimBadgeCollection
 from nti.app.products.acclaim.interfaces import IAcclaimOrganizationCollection
 from nti.app.products.acclaim.interfaces import MissingAcclaimOrganizationError
+from nti.app.products.acclaim.interfaces import DuplicateAcclaimBadageAwardedError
 
 from nti.dataserver.users.interfaces import IUserProfile
 from nti.dataserver.users.interfaces import IFriendlyNamed
@@ -168,6 +169,13 @@ class AcclaimClient(object):
                                     params=params,
                                     headers={'Authorization': access_header})
         if response.status_code not in acceptable_return_codes:
+            if response.status_code == 422:
+                try:
+                    error_dict = response.json()
+                    if "already has this badge" in error_dict['data']['message']:
+                        raise DuplicateAcclaimBadageAwardedError()
+                except KeyError:
+                    pass
             logger.warn('Error while making acclaim API call (%s) (%s) (%s)',
                         url,
                         response.status_code,

@@ -304,3 +304,11 @@ class MissingAcclaimOrganizationError(AcclaimClientError):
     This should not happen. Integrations should only make API calls
     if persistent and tied to an organization.
     """
+
+
+class DuplicateAcclaimBadageAwardedError(Exception):
+    """
+    Issued when a badge is awarded to a user, but the user has already
+    been awarded the badge. This should only occur if the awarded badge
+    is not configured for being awarded multiple times to a user.
+    """
