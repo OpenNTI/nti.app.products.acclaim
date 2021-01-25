@@ -288,7 +288,7 @@ class AcclaimClient(object):
         result = IAwardedAcclaimBadgeCollection(result.json())
         return result
 
-    def award_badge(self, user, badge_template_id, suppress_badge_notification_email=False, locale=None, evidence_ntiid=None):
+    def award_badge(self, user, badge_template_id, suppress_badge_notification_email=False, locale=None, evidence_ntiid=None, evidence_desc=None):
         """
         Award a badge to a user.
 
@@ -317,6 +317,7 @@ class AcclaimClient(object):
             assert is_valid_ntiid_string(evidence_ntiid)
             data['evidence'] = [{"type": "IdEvidence",
                                  "title": NT_EVIDENCE_NTIID_ID,
+                                 "description": evidence_desc,
                                  "id": evidence_ntiid}]
         url = self.BADGE_URL % self.organization_id
         result = self._make_call(url, post_data=data)
