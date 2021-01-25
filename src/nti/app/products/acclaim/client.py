@@ -150,7 +150,7 @@ class AcclaimClient(object):
 
     def _make_call(self, url, post_data=None, params=None, delete=False, acceptable_return_codes=None):
         if not acceptable_return_codes:
-            acceptable_return_codes = (200,)
+            acceptable_return_codes = (200,201)
         url = '%s%s' % (self.base_url, url)
         logger.debug('acclaim badges call (url=%s) (params=%s) (post_data=%s)',
                      url, params, post_data)
