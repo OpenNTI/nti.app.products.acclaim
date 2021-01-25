@@ -38,7 +38,7 @@ from nti.app.products.acclaim.interfaces import InvalidAcclaimIntegrationError
 from nti.app.products.acclaim.interfaces import IAwardedAcclaimBadgeCollection
 from nti.app.products.acclaim.interfaces import IAcclaimOrganizationCollection
 from nti.app.products.acclaim.interfaces import MissingAcclaimOrganizationError
-from nti.app.products.acclaim.interfaces import DuplicateAcclaimBadageAwardedError
+from nti.app.products.acclaim.interfaces import DuplicateAcclaimBadgeAwardedError
 
 from nti.dataserver.users.interfaces import IUserProfile
 from nti.dataserver.users.interfaces import IFriendlyNamed
@@ -173,7 +173,7 @@ class AcclaimClient(object):
                 try:
                     error_dict = response.json()
                     if "already has this badge" in error_dict['data']['message']:
-                        raise DuplicateAcclaimBadageAwardedError()
+                        raise DuplicateAcclaimBadgeAwardedError()
                 except KeyError:
                     pass
             logger.warn('Error while making acclaim API call (%s) (%s) (%s)',

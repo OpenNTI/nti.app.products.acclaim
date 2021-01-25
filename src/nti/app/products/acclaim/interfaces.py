@@ -306,7 +306,7 @@ class MissingAcclaimOrganizationError(AcclaimClientError):
     """
 
 
-class DuplicateAcclaimBadageAwardedError(Exception):
+class DuplicateAcclaimBadgeAwardedError(Exception):
     """
     Issued when a badge is awarded to a user, but the user has already
     been awarded the badge. This should only occur if the awarded badge
