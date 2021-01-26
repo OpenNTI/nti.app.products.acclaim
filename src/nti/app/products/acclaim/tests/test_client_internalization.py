@@ -52,6 +52,7 @@ class TestAcclaimClientInternalization(unittest.TestCase):
         assert_that(badge, verifiably_provides(IAcclaimBadge))
 
         assert_that(badge.organization_id, is_(u'b4deef45-9e00-4809-be6b-a6835a8f350e'))
+        assert_that(badge.organization_name, is_(u"Organization 5"))
         assert_that(badge.template_id, is_(u"823a5e0c-1d8d-4801-a5c8-bd4e3a776a4c"))
         assert_that(badge.allow_duplicate_badges, is_(True))
         assert_that(badge.description, is_(u"Dynamically deliver go forward e-tailers"))

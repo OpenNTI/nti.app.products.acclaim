@@ -164,6 +164,10 @@ class IAcclaimBadge(IShouldHaveTraversablePath, IAttributeAnnotatable):
                                     min_length=1,
                                     required=True)
 
+    organization_name = ValidTextLine(title=u'acclaim organization name',
+                                      min_length=1,
+                                      required=False)
+
     template_id = ValidText(title=u"Template id",
                             required=True)
 
