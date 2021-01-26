@@ -193,6 +193,9 @@ class IAcclaimBadge(IShouldHaveTraversablePath, IAttributeAnnotatable):
     image_url = HTTPURL(title=u"Badge image url",
                         required=False)
 
+    badge_url = HTTPURL(title=u"Badge url",
+                        required=False)
+
     created_at = ValidDatetime(title=u"Badge created date",
                                required=True)
 

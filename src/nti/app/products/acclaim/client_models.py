@@ -74,6 +74,7 @@ def _acclaim_badge_factory(ext):
     obj = AcclaimBadge()
     if 'owner' in ext:
         ext['organization_id'] = ext['owner'].get('id')
+    ext['badge_url'] = ext.pop('url')
     ext['template_id'] = ext['id']
     update_from_external_object(obj, ext)
     return obj

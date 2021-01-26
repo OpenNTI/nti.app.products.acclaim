@@ -63,6 +63,7 @@ class TestAcclaimClientInternalization(unittest.TestCase):
         assert_that(badge.image_url, is_(u"https://cdn.example.com/path/to/image.png"))
         assert_that(badge.created_at, not_none())
         assert_that(badge.updated_at, not_none())
+        assert_that(badge.badge_url, is_(u"https://www.youracclaim.com/org/organization-5/badge/badge-template-7"))
 
         badge_ext = to_external_object(badge)
         assert_that(badge_ext, has_entries('organization_id', u'b4deef45-9e00-4809-be6b-a6835a8f350e',
