@@ -288,7 +288,8 @@ class AcclaimClient(object):
         result = IAwardedAcclaimBadgeCollection(result.json())
         return result
 
-    def award_badge(self, user, badge_template_id, suppress_badge_notification_email=False, locale=None, evidence_ntiid=None, evidence_desc=None):
+    def award_badge(self, user, badge_template_id, suppress_badge_notification_email=False,
+                    locale=None, evidence_ntiid=None, evidence_title=None, evidence_desc=None):
         """
         Award a badge to a user.
 
@@ -301,7 +302,7 @@ class AcclaimClient(object):
         # matter if invalid, bounced etc.
         data['recipient_email'] = self._get_user_email(user)
 
-        # TODO: Raise if no real name?
+        # TODO: Raise if no real name? Is this possible?
         friendly_named = IFriendlyNamed(user)
         if friendly_named.realname and '@' not in friendly_named.realname:
             human_name = nameparser.HumanName(friendly_named.realname)
@@ -315,10 +316,11 @@ class AcclaimClient(object):
             data['locale'] = locale
         if evidence_ntiid:
             assert is_valid_ntiid_string(evidence_ntiid)
+            evidence_id = '%s=%s' % (NT_EVIDENCE_NTIID_ID, evidence_ntiid)
             data['evidence'] = [{"type": "IdEvidence",
-                                 "title": NT_EVIDENCE_NTIID_ID,
+                                 "title": evidence_title,
                                  "description": evidence_desc,
-                                 "id": evidence_ntiid}]
+                                 "id": evidence_id}]
         url = self.BADGE_URL % self.organization_id
         result = self._make_call(url, post_data=data)
         result = IAwardedAcclaimBadge(result.json())
