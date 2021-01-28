@@ -13,4 +13,5 @@ from zope.security.permission import Permission
 logger = __import__('logging').getLogger(__name__)
 
 
+#: Permission for managing acclaim integration
 ACT_ACCLAIM = Permission('nti.actions.acclaim')

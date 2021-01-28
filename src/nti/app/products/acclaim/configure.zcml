@@ -48,6 +48,11 @@
     <utility factory=".integration.AcclaimIntegrationProvider"
              name="acclaim" />
 
+    <!-- Security -->
+    <adapter factory=".acl.AcclaimIntegrationACLProvider"
+             for=".interfaces.IAcclaimIntegration"
+             provides="nti.dataserver.interfaces.IACLProvider"/>
+
     <!-- Decorators -->
     <subscriber factory=".decorators._BadgeDecorator"
                 provides="nti.externalization.interfaces.IExternalMappingDecorator"
