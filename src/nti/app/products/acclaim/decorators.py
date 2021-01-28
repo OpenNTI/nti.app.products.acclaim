@@ -30,14 +30,16 @@ from nti.appserver.pyramid_authorization import has_permission
 from nti.app.products.acclaim.authorization import ACT_ACCLAIM
 
 from nti.dataserver.authorization import ACT_READ
+from nti.dataserver.authorization import ACT_CONTENT_EDIT
 
 from nti.dataserver.interfaces import IUser
 
 from nti.externalization.interfaces import StandardExternalFields
 from nti.externalization.interfaces import IExternalMappingDecorator
 
-from nti.links.links import Link
 from nti.externalization.singleton import Singleton
+
+from nti.links.links import Link
 
 LINKS = StandardExternalFields.LINKS
 TOTAL = StandardExternalFields.TOTAL
@@ -76,10 +78,6 @@ class _AcclaimEnableIntegrationDecorator(AbstractAuthenticatedRequestAwareDecora
 @interface.implementer(IExternalMappingDecorator)
 class _AcclaimIntegrationDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
-    def _predicate(self, context, result):
-        return super(_AcclaimIntegrationDecorator, self)._predicate(context, result) \
-           and has_permission(ACT_ACCLAIM, context, self.request)
-
     def _obscure_authorization_token(self, token):
         """
         Return first 3/4 of token as astericks.
@@ -95,15 +93,17 @@ class _AcclaimIntegrationDecorator(AbstractAuthenticatedRequestAwareDecorator):
         if context.authorization_token:
             result['authorization_token'] = self._obscure_authorization_token(context.authorization_token)
         links = result.setdefault(LINKS, [])
-        link = Link(context,
-                    rel='disconnect',
-                    method='DELETE')
-        links.append(located_link(context, link))
+        if has_permission(ACT_ACCLAIM, context, self.request):
+            link = Link(context,
+                        rel='disconnect',
+                        method='DELETE')
+            links.append(located_link(context, link))
 
-        link = Link(context,
-                    rel='badges',
-                    elements=(BADGES,))
-        links.append(located_link(context, link))
+        if has_permission(ACT_CONTENT_EDIT, context, self.request):
+            link = Link(context,
+                        rel='badges',
+                        elements=(BADGES,))
+            links.append(located_link(context, link))
 
 
 @component.adapter(IUser)

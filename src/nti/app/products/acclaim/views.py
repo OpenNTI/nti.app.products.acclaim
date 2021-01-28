@@ -24,7 +24,6 @@ from nti.app.base.abstract_views import AbstractAuthenticatedView
 
 from nti.app.externalization.error import raise_json_error
 
-from nti.app.externalization.view_mixins import BatchingUtilsMixin
 from nti.app.externalization.view_mixins import ModeledContentUploadRequestUtilsMixin
 
 from nti.app.products.acclaim import BADGES
@@ -48,6 +47,7 @@ from nti.appserver.ugd_edit_views import UGDPutView
 from nti.appserver.ugd_edit_views import UGDDeleteView
 
 from nti.dataserver.authorization import ACT_READ
+from nti.dataserver.authorization import ACT_CONTENT_EDIT
 
 from nti.dataserver.interfaces import IUser
 from nti.dataserver.interfaces import IHostPolicyFolder
@@ -213,7 +213,7 @@ class AcclaimIntegrationGetView(GenericGetView):
 @view_config(route_name='objects.generic.traversal',
              context=IAcclaimBadge,
              request_method='DELETE',
-             permission=ACT_ACCLAIM,
+             permission=ACT_CONTENT_EDIT,
              renderer='rest')
 class AcclaimBadgeDeleteView(UGDDeleteView):
     """
@@ -290,7 +290,7 @@ class AbstractAcclaimAPIView(AbstractAuthenticatedView):
              context=IAcclaimIntegration,
              request_method='GET',
              name=BADGES,
-             permission=ACT_ACCLAIM,
+             permission=ACT_CONTENT_EDIT,
              renderer='rest')
 class AcclaimBadgesView(AbstractAcclaimAPIView):
     """
