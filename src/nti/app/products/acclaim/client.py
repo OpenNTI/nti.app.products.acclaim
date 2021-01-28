@@ -274,7 +274,7 @@ class AcclaimClient(object):
         # user may have multiple email addresses on their Acclaim account.
         filters['recipient_email_all'] = self._get_user_email(user)
         if public_only:
-            filters['public'] = True
+            filters['public'] = 'true'
         # We only want pending or accepted badges (not revoked or rejected)
         filters['state'] = 'pending,accepted'
         if sort:
