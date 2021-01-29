@@ -260,7 +260,8 @@ class AcclaimClient(object):
             date_obj = date_obj.replace(tzinfo=pytz.UTC)
         return date_obj.strftime("%Y-%m-%d %H:%M:%S %z")
 
-    def get_awarded_badges(self, user, sort=None, filters=None, page=None, public_only=None):
+    def get_awarded_badges(self, user, sort=None, filters=None, page=None,
+                           public_only=None, accepted_only=False):
         """
         Return an :class:`IAwardedAcclaimBadgeCollection`.
 
@@ -276,7 +277,10 @@ class AcclaimClient(object):
         if public_only:
             filters['public'] = 'true'
         # We only want pending or accepted badges (not revoked or rejected)
-        filters['state'] = 'pending,accepted'
+        if accepted_only:
+            filters['state'] = 'accepted'
+        else:
+            filters['state'] = 'pending,accepted'
         if sort:
             params['sort'] = self._get_sort_str(sort)
         if filters:

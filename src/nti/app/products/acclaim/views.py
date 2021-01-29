@@ -334,7 +334,7 @@ class UserAwardedBadgesView(AbstractAcclaimAPIView):
     NAME_FILTER_KEY = 'badge_templates[name]'
 
     def _do_call(self):
-        public_only = self.remoteUser != self.context
+        accepted_only = public_only = self.remoteUser != self.context
         integration = component.queryUtility(IAcclaimIntegration)
         if not integration:
             raise hexc.HTTPNotFound()
@@ -344,7 +344,8 @@ class UserAwardedBadgesView(AbstractAcclaimAPIView):
                                                    sort=self.sort,
                                                    filters=self.filter,
                                                    page=self.page,
-                                                   public_only=public_only)
+                                                   public_only=public_only,
+                                                   accepted_only=accepted_only)
         except AcclaimClientError:
             raise_error({'message': _(u"Error while getting issued badges."),
                          'code': 'AcclaimClientError'})

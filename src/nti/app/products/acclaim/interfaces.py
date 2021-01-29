@@ -137,7 +137,7 @@ class IAcclaimClient(interface.Interface):
         https://www.youracclaim.com/docs/badge_templates
         """
 
-    def get_awarded_badges(user, sort=None, filters=None, page=None, public_only=None):
+    def get_awarded_badges(user, sort=None, filters=None, page=None, public_only=None, accepted_only=False):
         """
         Return an :class:`IAwardedAcclaimBadgeCollection`.
 
