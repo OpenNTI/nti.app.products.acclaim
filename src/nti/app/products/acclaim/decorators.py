@@ -19,7 +19,8 @@ from nti.app.products.acclaim import BADGES
 from nti.app.products.acclaim import ENABLE_ACCLAIM_VIEW
 from nti.app.products.acclaim import VIEW_AWARDED_BADGES
 
-from nti.app.products.acclaim.interfaces import IAcclaimBadge
+from nti.app.products.acclaim.interfaces import IAcclaimBadge,\
+    IAwardedAcclaimBadge
 from nti.app.products.acclaim.interfaces import IBadgePageMetadata
 from nti.app.products.acclaim.interfaces import IAcclaimIntegration
 
@@ -40,6 +41,7 @@ from nti.externalization.interfaces import IExternalMappingDecorator
 from nti.externalization.singleton import Singleton
 
 from nti.links.links import Link
+from nti.traversal.traversal import find_interface
 
 LINKS = StandardExternalFields.LINKS
 TOTAL = StandardExternalFields.TOTAL
@@ -137,6 +139,19 @@ class _BadgeDecorator(AbstractAuthenticatedRequestAwareDecorator):
         current_organization_id = getattr(integration.organization, 'organization_id', None)
         mapping['InvalidOrganization'] =   not current_organization_id \
                                         or context.organization_id != current_organization_id
+
+
+@component.adapter(IAwardedAcclaimBadge)
+@interface.implementer(IExternalMappingDecorator)
+class _AcclaimAwardedBadgeDecorator(AbstractAuthenticatedRequestAwareDecorator):
+
+    def _predicate(self, context, unused_result):
+        user = find_interface(context, IUser)
+        return user != self.remoteUser
+
+    def _do_decorate_external(self, unused_context, mapping):
+        mapping.pop('accept_badge_url', None)
+        mapping.pop('badge_url', None)
 
 
 @component.adapter(IBadgePageMetadata)

@@ -128,6 +128,9 @@ def _awarded_acclaim_badge_collection_factory(ext):
     new_ext['current_page'] = metadata.get('current_page')
     new_ext['total_pages'] = metadata.get('total_pages')
     update_from_external_object(obj, new_ext)
+    # Set lineage
+    for badge in obj.Items:
+        badge.__parent__ = obj
     return obj
 
 

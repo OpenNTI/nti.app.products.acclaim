@@ -286,6 +286,7 @@ class AcclaimClient(object):
         url = self.BADGE_URL % self.organization_id
         result = self._make_call(url, params=params)
         result = IAwardedAcclaimBadgeCollection(result.json())
+        result.__parent__ = user
         return result
 
     def award_badge(self, user, badge_template_id, suppress_badge_notification_email=False,

@@ -54,6 +54,11 @@
              provides="nti.dataserver.interfaces.IACLProvider"/>
 
     <!-- Decorators -->
+    <subscriber factory=".decorators._AcclaimAwardedBadgeDecorator"
+                provides="nti.externalization.interfaces.IExternalMappingDecorator"
+                for=".interfaces.IAwardedAcclaimBadge
+                     pyramid.interfaces.IRequest" />
+
     <subscriber factory=".decorators._BadgeDecorator"
                 provides="nti.externalization.interfaces.IExternalMappingDecorator"
                 for=".interfaces.IAcclaimBadge
