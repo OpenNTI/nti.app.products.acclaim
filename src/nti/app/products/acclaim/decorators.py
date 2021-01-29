@@ -41,7 +41,6 @@ from nti.externalization.interfaces import IExternalMappingDecorator
 from nti.externalization.singleton import Singleton
 
 from nti.links.links import Link
-from nti.traversal.traversal import find_interface
 
 LINKS = StandardExternalFields.LINKS
 TOTAL = StandardExternalFields.TOTAL
@@ -146,8 +145,7 @@ class _BadgeDecorator(AbstractAuthenticatedRequestAwareDecorator):
 class _AcclaimAwardedBadgeDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
     def _predicate(self, context, unused_result):
-        user = find_interface(context, IUser)
-        return user != self.remoteUser
+        return context.User != self.remoteUser
 
     def _do_decorate_external(self, unused_context, mapping):
         mapping.pop('accept_badge_url', None)
