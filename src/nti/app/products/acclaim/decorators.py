@@ -35,7 +35,8 @@ from nti.dataserver.authorization import ACT_CONTENT_EDIT
 
 from nti.dataserver.interfaces import IUser
 
-from nti.externalization.interfaces import StandardExternalFields
+from nti.externalization.interfaces import StandardExternalFields,\
+    IExternalObjectDecorator
 from nti.externalization.interfaces import IExternalMappingDecorator
 
 from nti.externalization.singleton import Singleton
@@ -141,7 +142,7 @@ class _BadgeDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
 
 @component.adapter(IAwardedAcclaimBadge)
-@interface.implementer(IExternalMappingDecorator)
+@interface.implementer(IExternalObjectDecorator)
 class _AcclaimAwardedBadgeDecorator(AbstractAuthenticatedRequestAwareDecorator):
 
     def _predicate(self, context, unused_result):

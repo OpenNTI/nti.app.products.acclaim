@@ -55,7 +55,7 @@
 
     <!-- Decorators -->
     <subscriber factory=".decorators._AcclaimAwardedBadgeDecorator"
-                provides="nti.externalization.interfaces.IExternalMappingDecorator"
+                provides="nti.externalization.interfaces.IExternalObjectDecorator"
                 for=".interfaces.IAwardedAcclaimBadge
                      pyramid.interfaces.IRequest" />
 
