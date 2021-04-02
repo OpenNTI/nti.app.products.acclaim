@@ -60,7 +60,7 @@ def integration_to_client(integration):
 @interface.implementer(IAcclaimInitializationUtility)
 class _AcclaimInitializationUtility(object):
 
-    BASE_URLS = ('https://api.youracclaim.com/v1',
+    BASE_URLS = ('https://api.credly.com/v1',
                  'https://sandbox-api.credly.com/v1')
 
     @property
