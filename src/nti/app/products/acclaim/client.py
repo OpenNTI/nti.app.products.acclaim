@@ -61,7 +61,7 @@ def integration_to_client(integration):
 class _AcclaimInitializationUtility(object):
 
     BASE_URLS = ('https://api.youracclaim.com/v1',
-                 'https://sandbox.youracclaim.com/v1')
+                 'https://sandbox-api.credly.com/v1')
 
     @property
     def site(self):
