@@ -137,7 +137,7 @@ class EnableAcclaimIntegrationView(AbstractAuthenticatedView,
                     self.site.__name__, self.remoteUser)
         # XXX: The usual "what do we do" for parent and child site questions here.
         if component.queryUtility(IAcclaimIntegration):
-            raise_error({'message': _(u"Acclaim integration already exist"),
+            raise_error({'message': _(u"Acclaim integration already exists"),
                          'code': 'ExistingAcclaimIntegrationError'})
         integration = self.readCreateUpdateContentObject(self.remoteUser)
         result = self.set_organization(integration)
